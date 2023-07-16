@@ -1,9 +1,9 @@
-import { use, ApiGateway, StackContext } from "sst/constructs";
+import { use, Api, StackContext } from "sst/constructs";
 import { Database } from "./Database";
 
-export function Api({ stack }: StackContext) {
+export function NotesApi({ stack }: StackContext) {
   // Create a HTTP API
-  const api = new ApiGateway(stack, "Api", {
+  const api = new Api(stack, "Api", {
     defaults: {
       function: {
         // Bind the database to our API
@@ -11,8 +11,11 @@ export function Api({ stack }: StackContext) {
       },
     },
     routes: {
-      "GET /": "packages/functions/src/get-count.main",
-      "POST /": "packages/functions/src/lambda.main",
+      "GET /notes": "packages/functions/src/list.handler",
+      "POST /notes": "packages/functions/src/create.handler",
+      "GET /notes/{id}": "packages/functions/src/get.handler",
+      "PUT /notes/{id}": "packages/functions/src/update.handler",
+      "DELETE /notes/{id}": "packages/functions/src/delete.handler",
     },
   });
 

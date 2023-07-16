@@ -1,8 +1,8 @@
 import { use, StackContext, StaticSite } from "sst/constructs";
-import { Api } from "./Api.js";
+import { NotesApi } from "./Api.js";
 
 export function Web({ stack }: StackContext) {
-  const api = use(Api);
+  const api = use(NotesApi);
 
   const site = new StaticSite(stack, "VueJSSite", {
     path: "packages/frontend",
