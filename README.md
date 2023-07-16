@@ -6,6 +6,8 @@ An example full-stack serverless Vue.js app created with SST.
 
 [**Read the tutorial**](https://sst.dev/examples/how-to-create-a-vuejs-app-with-serverless.html)
 
+Refer https://docs.sst.dev/learn/ for more.
+
 Install the example.
 
 ```bash
