@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import ClickCount from '@/components/ClickCount.vue'
+import Note from '@/components/Note.vue';
+import NoteEditor from '@/components/NoteEditor.vue';
 </script>
 
 <template>
   <main>
-    <ClickCount />
+    <NoteEditor />
   </main>
 </template>
