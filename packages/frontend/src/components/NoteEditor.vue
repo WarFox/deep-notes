@@ -1,23 +1,22 @@
 <template>
-    <QuillEditor :options="options" />
+    <QuillEditor @textChange="handleChange" :options="options" />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
-import { QuillEditor } from '@vueup/vue-quill'
+import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
-export default {
-    components: {
-        QuillEditor
-    },
-    data() {
-        return {
-            options: {
-                placeholder: 'Start collaborating :tada:',
-                theme: 'snow'
-            }
-        }
-    },
+const options = {
+    placeholder: 'Start collaborating! :tada:',
+    theme: 'snow'
+}
+
+function handleChange(change: {
+    delta: any,
+    oldContents: any,
+    source: any
+}) {
+    console.log(change.delta);
 }
 </script>
