@@ -1,5 +1,5 @@
 import { SSTConfig } from "sst";
-import { NotesApi } from "./stacks/Api";
+import { Api } from "./stacks/Api";
 import { Web } from "./stacks/Web";
 import { Database } from "./stacks/Database";
 
@@ -11,6 +11,6 @@ export default {
     };
   },
   stacks(app) {
-    app.stack(Database).stack(NotesApi).stack(Web);
+    app.stack(Database).stack(Api).stack(Web);
   },
 } satisfies SSTConfig;
