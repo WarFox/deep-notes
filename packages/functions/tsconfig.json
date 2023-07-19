@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@sst-vue-notes/core/*": ["../core/src/*"]
+      "@deep-notes/core/*": ["../core/src/*"]
     }
   }
 }

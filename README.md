@@ -1,6 +1,6 @@
-# How to create a Vue.js app
+# Deep Notes
 
-An example full-stack serverless Vue.js app created with SST.
+A realtime collaborative notes platform on AWS [Serverless Stack](https://sst.dev/) powered by [Quill](https://quilljs.com/), [Vue](https://vuejs.org/) and [Ably](https://ably.com/).
 
 ## Getting Started
 

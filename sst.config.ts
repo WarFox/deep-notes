@@ -6,7 +6,7 @@ import { Database } from "./stacks/Database";
 export default {
   config(_input) {
     return {
-      name: "sst-vue-notes",
+      name: "deep-notes",
       region: "eu-west-1",
     };
   },

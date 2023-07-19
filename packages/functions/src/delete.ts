@@ -1,4 +1,4 @@
-import { Notes } from "@sst-vue-notes/core/notes";
+import { Notes } from "@deepu-notes/core/notes";
 
 export async function handler() {
   return {
