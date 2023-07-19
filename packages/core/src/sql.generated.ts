@@ -12,8 +12,6 @@ export interface Notes {
   content: string;
   created_at: Generated<Timestamp>;
   created_by: string;
-  updated_at: Generated<string>;
-  updated_by: string;
 }
 
 export interface Database {

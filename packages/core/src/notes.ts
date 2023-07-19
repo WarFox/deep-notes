@@ -1,16 +1,31 @@
 export * as Notes from "./notes";
 
+import { ulid } from "ulid";
+import { SQL } from "./sql";
+
 interface Note {
   noteId: String;
+  title: String;
   content: String;
   createdAt: Date;
   createdBy: String;
-  updatedAt: Date;
-  updatedBy: String;
 }
 
-export function create(note: { userId: String; content: String }) {
-  return undefined;
+export async function create(note: {
+  createdBy: String;
+  title: String;
+  content: String;
+}) {
+  const [result] = await SQL.DB.insertInto("notes")
+    .values({
+      note_id: ulid(),
+      created_by: note.createdBy,
+      title: note.title,
+      content: note.content,
+    })
+    .returningAll()
+    .execute();
+  return result;
 }
 
 export function remove(noetId: String) {

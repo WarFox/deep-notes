@@ -13,10 +13,6 @@ export async function up(db) {
       col.notNull().defaultTo(sql`now()`)
     )
     .addColumn("created_by", "text", (col) => col.notNull())
-    .addColumn("updated_at", "text", (col) =>
-      col.notNull().defaultTo(sql`now()`)
-    )
-    .addColumn("updated_by", "text", (col) => col.notNull())
     .execute();
 
   await db.schema
@@ -30,6 +26,6 @@ export async function up(db) {
  * @param db {Kysely<any>}
  */
 export async function down(db) {
-  await db.schema.dropIndex("idx_notes_createdat").execute();
+  await db.schema.dropIndex("idx_notes_created_by").execute();
   await db.schema.dropTable("notes").execute();
 }
