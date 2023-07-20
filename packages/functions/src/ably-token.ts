@@ -14,7 +14,7 @@ export async function handler(event) {
     clientId: queryStringParameters.rnd,
   };
 
-  const tokenRequest = await new Promise((resolve, reject) => {
+  const tokenRequestData = await new Promise((resolve, reject) => {
     realtime.auth.createTokenRequest(tokenParams, null, (err, tokenRequest) => {
       if (err) {
         reject(err);
@@ -26,6 +26,7 @@ export async function handler(event) {
 
   return {
     statusCode: 200,
-    body: JSON.stringify(tokenRequest),
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(tokenRequestData),
   };
 }
