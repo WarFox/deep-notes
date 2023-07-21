@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import AvatarStack from '@/components/AvatarStacks.vue'
+import HeroSection from '@/components/HeroSection.vue'
 </script>
 
 <template>
   <main>
-    <AvatarStack />
+    <HeroSection
+      heroText="Collaborative text-editor for the 21st Century"
+      msg="Start writing your notes and share it others in realtime "
+    />
   </main>
 </template>
