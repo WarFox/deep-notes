@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import AvatarStack from '@/components/AvatarStacks.vue'
+import NoteEditor from '@/components/NoteEditor.vue'
 </script>
 
 <template>
   <main>
-    <AvatarStack />
+    <NoteEditor />
   </main>
 </template>
