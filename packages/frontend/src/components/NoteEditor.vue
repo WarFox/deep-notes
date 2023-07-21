@@ -1,5 +1,10 @@
 <template>
-  <main>
+  <main class="px-2">
+    <!-- connection indicator -->
+    <span v-if="isChannelAttached" class="flex w-2 h-2 bg-green-500 rounded-full"></span>
+    <span v-else class="flex w-2 h-2 bg-red-500 rounded-full"></span>
+
+    <div class="my-4">
     <QuillEditor
       ref="editor"
       content-type="delta"
@@ -7,6 +12,7 @@
       @ready="handleReady"
       :options="options"
     />
+    </div>
   </main>
 </template>
 
@@ -20,7 +26,7 @@ import { useRealtimeStore } from '@/stores/realtime'
 
 const options = {
   placeholder: 'Start collaborating! :tada:',
-  theme: 'snow',
+  theme: 'snow'
 }
 
 // The ref=editor in QuillEditor works like magic!
