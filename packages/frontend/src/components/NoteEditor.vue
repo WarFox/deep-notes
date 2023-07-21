@@ -4,14 +4,17 @@
     <span v-if="isChannelAttached" class="flex w-2 h-2 bg-green-500 rounded-full"></span>
     <span v-else class="flex w-2 h-2 bg-red-500 rounded-full"></span>
 
-    <div class="my-4">
-    <QuillEditor
-      ref="editor"
-      content-type="delta"
-      @textChange="handleTextChange"
-      @ready="handleReady"
-      :options="options"
-    />
+    <div v-if="isLoading" class="text-center">
+      <LoadingIndicator />
+    </div>
+    <div v-else class="my-2">
+      <QuillEditor
+        ref="editor"
+        content-type="delta"
+        @textChange="handleTextChange"
+        @ready="handleReady"
+        :options="options"
+      />
     </div>
   </main>
 </template>
@@ -21,6 +24,7 @@ import { QuillEditor, Delta, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { ref, computed, onMounted, watch } from 'vue'
 import { Types, Realtime } from 'ably'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 
 import { useRealtimeStore } from '@/stores/realtime'
 
@@ -36,6 +40,8 @@ const quill = ref<Quill>(null)
 const store = useRealtimeStore()
 const channel = computed(() => store.channel)
 const isChannelAttached = computed(() => store.isChannelAttached)
+
+const isLoading = computed(() => !isChannelAttached && !store.ablyClientId)
 
 interface TextChange {
   delta: Delta
