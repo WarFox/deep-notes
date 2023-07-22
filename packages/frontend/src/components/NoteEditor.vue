@@ -1,7 +1,7 @@
 <template>
   <main class="px-2">
     <!-- connection indicator -->
-    <span v-if="isChannelAttached" class="flex w-2 h-2 bg-green-500 rounded-full"></span>
+    <span v-if="isConnected" class="flex w-2 h-2 bg-green-500 rounded-full"></span>
     <span v-else class="flex w-2 h-2 bg-red-500 rounded-full"></span>
 
     <div v-if="isLoading" class="text-center">
@@ -22,16 +22,11 @@
 <script setup lang="ts">
 import { QuillEditor, Delta, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Types, Realtime } from 'ably'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 
 import { useRealtimeStore } from '@/stores/realtime'
-
-const options = {
-  placeholder: 'Start collaborating! :tada:',
-  theme: 'snow'
-}
 
 // The ref=editor in QuillEditor works like magic!
 const editor = ref(null)
@@ -39,9 +34,15 @@ const quill = ref<Quill>(null)
 
 const store = useRealtimeStore()
 const channel = computed(() => store.channel)
-const isChannelAttached = computed(() => store.isChannelAttached)
 
-const isLoading = computed(() => !isChannelAttached && !store.ablyClientId)
+const isConnected = computed(() => store.isConnected && store.isChannelAttached)
+const isLoading = computed(() => !isConnected)
+
+const options = {
+  placeholder: 'Start collaborating! :tada:',
+  theme: 'snow',
+  readOnly: !isConnected
+}
 
 interface TextChange {
   delta: Delta
@@ -62,8 +63,8 @@ function handleTextChange(change: TextChange) {
 }
 
 // Subscribe to channel only after channel is attached
-watch(isChannelAttached, (isAttached) => {
-  if (isAttached) {
+watch(isConnected, () => {
+  if (isConnected) {
     channel.value.subscribe('delta', (message: Types.Message) => {
       if (message.clientId !== store.ablyClientId) {
         quill.value.updateContents(message.data)
@@ -74,6 +75,19 @@ watch(isChannelAttached, (isAttached) => {
 
 onMounted(() => {
   store.initializeAbly()
+
+  window.addEventListener('beforeunload', (event) => {
+    // on the navigation type checking refresh or close tab/browser for logout
+    if (performance.navigation.type != 1) {
+      store.disconnectAbly() // gracefully disconnect before closing window
+    }
+
+    return false
+  })
+})
+
+onUnmounted(() => {
+  store.disconnectAbly()
 })
 
 /* References
