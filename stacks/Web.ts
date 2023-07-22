@@ -1,8 +1,10 @@
 import { use, StackContext, StaticSite } from "sst/constructs";
-import { Api } from "./Api.js";
+import { Api } from "./Api";
+import { Auth } from "./Auth";
 
 export function Web({ stack }: StackContext) {
   const api = use(Api);
+  const auth = use(Auth);
 
   const site = new StaticSite(stack, "VueJSSite", {
     path: "packages/frontend",
@@ -12,6 +14,8 @@ export function Web({ stack }: StackContext) {
     environment: {
       // Pass in the API endpoint to our app
       VITE_APP_API_URL: api.url,
+      VITE_APP_USER_POOL_ID: auth.userPoolId,
+      VITE_APP_USER_POOL_CLIENT_ID: auth.userPoolClientId,
     },
   });
 
