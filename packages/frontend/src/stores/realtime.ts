@@ -15,11 +15,21 @@ export const useRealtimeStore = defineStore('realtime', () => {
 
   const isChannelAttached = ref(false)
 
-  function attachAblyChannel() {
-    channel.value = ablyRealtimeClient.value.channels.get(channelName, {
+  function _connected(realtime: Realtime) {
+    isConnected.value = true
+    ablyClientId.value = realtime.auth.clientId
+    ablyRealtimeClient.value = realtime
+
+    // attach channel
+    channel.value = realtime.channels.get(channelName, {
       // params: { rewind: '2m' }
     })
     isChannelAttached.value = true
+  }
+
+  function _disconnected() {
+    isConnected.value = false
+    isChannelAttached.value = false
   }
 
   async function initializeAbly() {
@@ -32,18 +42,9 @@ export const useRealtimeStore = defineStore('realtime', () => {
 
       const realtime = new Realtime(clientOptions)
 
-      realtime.connection.on('connected', () => {
-        isConnected.value = true
-        ablyClientId.value = realtime.auth.clientId
-        ablyRealtimeClient.value = realtime
+      realtime.connection.on('connected', () => _connected(realtime))
 
-        attachAblyChannel()
-      })
-
-      realtime.connection.on('disconnected', () => {
-        isConnected.value = false
-        isChannelAttached.value = false
-      })
+      realtime.connection.on('disconnected', () => _disconnected())
     }
   }
 
