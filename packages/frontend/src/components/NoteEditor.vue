@@ -1,8 +1,11 @@
 <template>
   <main class="px-2">
-    <!-- connection indicator -->
-    <span v-if="isConnected" class="flex w-2 h-2 bg-green-500 rounded-full"></span>
-    <span v-else class="flex w-2 h-2 bg-red-500 rounded-full"></span>
+
+    <!-- Connection indicator -->
+    <span
+      class="flex w-2 h-2 rounded-full"
+      :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
+    ></span>
 
     <div v-if="isLoading" class="text-center">
       <LoadingIndicator />
