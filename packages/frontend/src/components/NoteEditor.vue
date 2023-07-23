@@ -73,6 +73,9 @@ watch(isConnected, () => {
         quill.value.updateContents(message.data)
       }
     })
+
+    // setup presence immediately after connection
+    store.setupPresence()
   }
 })
 

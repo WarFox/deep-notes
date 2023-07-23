@@ -3,6 +3,11 @@ import { ref } from 'vue'
 
 import { Realtime, Types } from 'ably'
 
+function getRandomColor(): string {
+  let colors = ['red', 'green', 'blue', 'orange', 'pink', 'black', 'purple']
+  return colors[Math.floor(Math.random() * colors.length)]
+}
+
 export const useRealtimeStore = defineStore('realtime', () => {
   const authUrl = ref(`${import.meta.env.VITE_APP_API_URL}/ably-token`)
 
@@ -25,6 +30,28 @@ export const useRealtimeStore = defineStore('realtime', () => {
       // params: { rewind: '2m' }
     })
     isChannelAttached.value = true
+  }
+
+  function setupPresence() {
+    // presence enter
+    // TODO get initials from auth
+    channel.value.presence.enter({
+      id: ablyClientId.value,
+      color: getRandomColor()
+    })
+
+    channel.value.presence.subscribe(
+      ['enter', 'present', 'update'],
+      (msg: Types.PresenceMessage) => {
+        if (msg.clientId !== ablyClientId.value) {
+          console.log('new client presence', msg.data)
+        }
+      }
+    )
+
+    channel.value.presence.subscribe('leave', (msg: Types.PresenceMessage) => {
+      console.log('a participent left', msg)
+    })
   }
 
   function _disconnected() {
@@ -58,6 +85,7 @@ export const useRealtimeStore = defineStore('realtime', () => {
     channel,
     initializeAbly,
     isConnected,
+    setupPresence,
     isChannelAttached,
     ablyClientId,
     disconnectAbly
