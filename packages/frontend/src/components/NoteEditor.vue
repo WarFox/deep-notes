@@ -1,8 +1,13 @@
 <template>
   <main class="px-2">
-    <!-- connection indicator -->
-    <span v-if="isConnected" class="flex w-2 h-2 bg-green-500 rounded-full"></span>
-    <span v-else class="flex w-2 h-2 bg-red-500 rounded-full"></span>
+
+    <!-- Connection indicator -->
+    <span
+      class="flex w-2 h-2 rounded-full"
+      :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
+    ></span>
+
+    <AvatarStacks />
 
     <div v-if="isLoading" class="text-center">
       <LoadingIndicator />
@@ -12,6 +17,7 @@
         ref="editor"
         content-type="delta"
         @textChange="handleTextChange"
+        @selectionChange="handleSelectionChange"
         @ready="handleReady"
         :options="options"
       />
@@ -25,6 +31,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Types, Realtime } from 'ably'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import AvatarStacks from '@/components/AvatarStacks.vue'
 
 import { useRealtimeStore } from '@/stores/realtime'
 
@@ -62,6 +69,16 @@ function handleTextChange(change: TextChange) {
   }
 }
 
+/*
+ * selection-change event is triggered when cursor is moved using arrow keys or mouse
+ */
+function handleSelectionChange({ range, oldRange, source }) {
+  if (range && source == 'user') {
+    const data = { color: store.color, range }
+    channel.value.presence.update(data)
+  }
+}
+
 // Subscribe to channel only after channel is attached
 watch(isConnected, () => {
   if (isConnected) {
@@ -70,6 +87,9 @@ watch(isConnected, () => {
         quill.value.updateContents(message.data)
       }
     })
+
+    // setup presence immediately after connection
+    store.setupPresence()
   }
 })
 
