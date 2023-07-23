@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@aws-amplify/ui-vue": "^3.1.21",
     "@vueup/vue-quill": "^1.2.0",
     "aws-amplify": "^5.3.5",
     "pinia": "^2.1.3",

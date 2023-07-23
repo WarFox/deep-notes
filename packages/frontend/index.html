@@ -13,10 +13,12 @@
   <div id="app"></div>
   <script type="module" src="/src/main.ts"></script>
   <script type="text/javascript">
-    // https://github.com/aws-amplify/amplify-js/issues/678
-    if (global === undefined) {
-      var global = window
+    // https://ui.docs.amplify.aws/vue/connected-components/authenticator#next-steps
+    window.global = window;
+    window.process = {
+      env: { DEBUG: undefined },
     }
+    var exports = {};
   </script>
 </body>
 
