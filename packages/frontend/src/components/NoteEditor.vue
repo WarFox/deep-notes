@@ -15,6 +15,7 @@
         ref="editor"
         content-type="delta"
         @textChange="handleTextChange"
+        @selectionChange="handleSelectionChange"
         @ready="handleReady"
         :options="options"
       />
@@ -62,6 +63,16 @@ function handleTextChange(change: TextChange) {
   // only publish changes made by the user
   if (change.source == 'user' && channel.value) {
     channel.value.publish('delta', change.delta)
+  }
+}
+
+/*
+ * selection-change event is triggered when cursor is moved using arrow keys or mouse
+ */
+function handleSelectionChange({ range, oldRange, source }) {
+  if (range && source == 'user') {
+    const data = { color: store.color, range }
+    channel.value.presence.update(data)
   }
 }
 

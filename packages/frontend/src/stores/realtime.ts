@@ -3,8 +3,13 @@ import { ref } from 'vue'
 
 import { Realtime, Types } from 'ably'
 
+interface Participant {
+  clientId: String
+  color: String
+}
+
 function getRandomColor(): string {
-  let colors = ['red', 'green', 'blue', 'orange', 'pink', 'black', 'purple']
+  let colors = ['red', 'green', 'blue', 'orange', 'pink', 'purple']
   return colors[Math.floor(Math.random() * colors.length)]
 }
 
@@ -12,13 +17,24 @@ export const useRealtimeStore = defineStore('realtime', () => {
   const authUrl = ref(`${import.meta.env.VITE_APP_API_URL}/ably-token`)
 
   const isConnected = ref(false)
-  const ablyRealtimeClient = ref<Realtime>(null)
+  const ablyRealtimeClient = ref<Realtime>()
   const ablyClientId = ref('noclientid')
 
   const channelName = 'editor'
-  const channel = ref(null)
+  const channel = ref()
 
   const isChannelAttached = ref(false)
+
+  const color = ref(getRandomColor())
+  const participants = ref(new Map<String, Participant>())
+
+  function addParticipant(participant: Participant) {
+    participants.value.set(participant.clientId, participant)
+  }
+
+  function removeParticipant(clientId: String) {
+    participants.value.delete(clientId)
+  }
 
   function _connected(realtime: Realtime) {
     isConnected.value = true
@@ -30,28 +46,6 @@ export const useRealtimeStore = defineStore('realtime', () => {
       // params: { rewind: '2m' }
     })
     isChannelAttached.value = true
-  }
-
-  function setupPresence() {
-    // presence enter
-    // TODO get initials from auth
-    channel.value.presence.enter({
-      id: ablyClientId.value,
-      color: getRandomColor()
-    })
-
-    channel.value.presence.subscribe(
-      ['enter', 'present', 'update'],
-      (msg: Types.PresenceMessage) => {
-        if (msg.clientId !== ablyClientId.value) {
-          console.log('new client presence', msg.data)
-        }
-      }
-    )
-
-    channel.value.presence.subscribe('leave', (msg: Types.PresenceMessage) => {
-      console.log('a participent left', msg)
-    })
   }
 
   function _disconnected() {
@@ -81,13 +75,39 @@ export const useRealtimeStore = defineStore('realtime', () => {
     isChannelAttached.value = false
   }
 
+  function setupPresence() {
+    // presence enter
+    channel.value.presence.subscribe(
+      ['enter', 'present', 'update'],
+      (msg: Types.PresenceMessage) => {
+        if (msg.clientId !== ablyClientId.value) {
+          const participant: Participant = {
+            clientId: msg.clientId,
+            color: msg.data.color
+          }
+          addParticipant(participant)
+        }
+      }
+    )
+
+    channel.value.presence.subscribe('leave', (msg: Types.PresenceMessage) => {
+      if (msg.clientId !== ablyClientId.value) {
+        participants.value.delete(msg.clientId)
+      }
+    })
+  }
+
   return {
-    channel,
-    initializeAbly,
-    isConnected,
-    setupPresence,
-    isChannelAttached,
     ablyClientId,
-    disconnectAbly
+    addParticipant,
+    channel,
+    participants,
+    color,
+    disconnectAbly,
+    initializeAbly,
+    isChannelAttached,
+    isConnected,
+    removeParticipant,
+    setupPresence
   }
 })

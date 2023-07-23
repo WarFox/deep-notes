@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useRealtimeStore } from '../realtime'
+import { useRealtimeStore, Participant } from '../realtime'
 import { Realtime } from 'ably'
 
 vi.mock('ably', () => {
@@ -36,9 +36,39 @@ describe('Realtime Store', () => {
     store = useRealtimeStore()
   })
 
+  it('initial values', () => {
+    expect(store.participants).toHaveLength(0)
+    expect(store.isConnected).toBe(false)
+    expect(store.ablyClientId).toBe('noclientid')
+  })
+
   it('initializeAbly', () => {
     store.initializeAbly()
-    expect(realtime.connection.on).toBeCalledTimes(2)
+
+    expect(store.participants).toHaveLength(0)
+    expect(realtime.connection.on).toHaveBeenCalledTimes(2)
+  })
+
+  it('addParticipant', () => {
+    expect(store.participants).toHaveLength(0)
+    const participant: Participant = { clientId: 'someid', color: 'some color' }
+    store.addParticipant(participant)
+    expect(store.participants).toHaveLength(1)
+    expect(store.participants.get('someid')).toEqual(participant)
+  })
+
+  it('removeParticipant', () => {
+    expect(store.participants).toHaveLength(0)
+    const p1: Participant = { clientId: 'someid', color: 'color1' }
+    const p2: Participant = { clientId: 'someid2', color: 'color2' }
+    store.participants.set(p1.clientId, p1)
+    store.participants.set(p2.clientId, p1)
+    expect(store.participants).toHaveLength(2)
+
+    store.removeParticipant('someid')
+    expect(store.participants).toHaveLength(1)
+    store.removeParticipant('someid2')
+    expect(store.participants).toHaveLength(0)
   })
 
   // TODO: Add more tests, Ably.Realtime is hard to mock
