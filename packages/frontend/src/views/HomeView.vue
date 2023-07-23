@@ -22,8 +22,6 @@
 
 <script setup lang="ts">
 import HeroSection from '@/components/HeroSection.vue'
-import SignUp from '@/components/SignUp.vue'
-import SignIn from '@/components/SignIn.vue'
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-vue'
 import '@aws-amplify/ui-vue/styles.css'
 
