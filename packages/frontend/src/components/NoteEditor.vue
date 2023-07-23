@@ -7,6 +7,8 @@
       :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
     ></span>
 
+    <AvatarStacks />
+
     <div v-if="isLoading" class="text-center">
       <LoadingIndicator />
     </div>
@@ -29,6 +31,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Types, Realtime } from 'ably'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import AvatarStacks from '@/components/AvatarStacks.vue'
 
 import { useRealtimeStore } from '@/stores/realtime'
 

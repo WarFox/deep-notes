@@ -6,10 +6,11 @@ import { Realtime, Types } from 'ably'
 interface Participant {
   clientId: String
   color: String
+  isConnected: boolean
 }
 
 function getRandomColor(): string {
-  let colors = ['red', 'green', 'blue', 'orange', 'pink', 'purple']
+  let colors = ['amber', 'blue', 'cyan', 'green', 'indigo', 'lime', 'orange', 'red']
   return colors[Math.floor(Math.random() * colors.length)]
 }
 
@@ -34,6 +35,11 @@ export const useRealtimeStore = defineStore('realtime', () => {
 
   function removeParticipant(clientId: String) {
     participants.value.delete(clientId)
+  }
+
+  function participantLeft(clientId: String) {
+    const participant = participants.value.get(clientId)
+    participants.value.set(clientId, { ...participant, ...{ isConnected: false } })
   }
 
   function _connected(realtime: Realtime) {
@@ -83,7 +89,8 @@ export const useRealtimeStore = defineStore('realtime', () => {
         if (msg.clientId !== ablyClientId.value) {
           const participant: Participant = {
             clientId: msg.clientId,
-            color: msg.data.color
+            color: msg.data.color,
+            isConnected: true
           }
           addParticipant(participant)
         }
@@ -92,7 +99,7 @@ export const useRealtimeStore = defineStore('realtime', () => {
 
     channel.value.presence.subscribe('leave', (msg: Types.PresenceMessage) => {
       if (msg.clientId !== ablyClientId.value) {
-        participants.value.delete(msg.clientId)
+        participantLeft(msg.clientId)
       }
     })
   }
@@ -108,6 +115,7 @@ export const useRealtimeStore = defineStore('realtime', () => {
     isChannelAttached,
     isConnected,
     removeParticipant,
+    participantLeft,
     setupPresence
   }
 })

@@ -71,5 +71,17 @@ describe('Realtime Store', () => {
     expect(store.participants).toHaveLength(0)
   })
 
+  it('participantLeft', () => {
+    const p1: Participant = { clientId: 'someid', color: 'color1', isConnected: true }
+    const p2: Participant = { clientId: 'someid2', color: 'color2', isConnected: true }
+    store.participants.set(p1.clientId, p1)
+    store.participants.set(p2.clientId, p1)
+
+    store.participantLeft('someid')
+
+    console.log(store.participants.get('someid'))
+    expect(store.participants.get('someid').isConnected).toBe(false)
+  })
+
   // TODO: Add more tests, Ably.Realtime is hard to mock
 })
