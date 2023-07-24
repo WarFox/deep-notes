@@ -11,32 +11,27 @@ interface Note {
   createdBy: String;
 }
 
-export async function create(note: {
-  createdBy: String;
-  title: String;
-  content: String;
-}) {
+export async function create(title: String, createdBy: String): Promise<Note> {
   const [result] = await SQL.DB.insertInto("notes")
     .values({
       note_id: ulid(),
-      created_by: note.createdBy,
-      title: note.title,
-      content: note.content,
+      created_by: createdBy,
+      title: title,
     })
     .returningAll()
     .execute();
   return result;
 }
 
-export function remove(noetId: String) {
+export function remove(noteId: String) {
   return undefined;
 }
 
-export function update(note: {
-  noetId: String;
-  userId: String;
-  content: String;
-}) {
+export function updateTitle(noteId: String, title: String) {
+  return undefined;
+}
+
+export function updateContent(noteId: String, content: String) {
   return undefined;
 }
 
@@ -44,6 +39,6 @@ export function get(noteId: String) {
   return {} as Note;
 }
 
-export function list() {
-  return [] as Note[];
+export async function list() {
+  return await SQL.DB.selectFrom("notes").selectAll().limit(10).execute();
 }
