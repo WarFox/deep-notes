@@ -23,8 +23,11 @@ export async function create(title: String, createdBy: String): Promise<Note> {
   return result;
 }
 
-export function remove(noteId: String) {
-  return undefined;
+export async function remove(noteId: String) {
+  const result = await SQL.DB.deleteFrom("notes")
+    .where("notes.note_id", "=", noteId)
+    .executeTakeFirst();
+  return result.numDeletedRows;
 }
 
 export function updateTitle(noteId: String, title: String) {
@@ -35,8 +38,11 @@ export function updateContent(noteId: String, content: String) {
   return undefined;
 }
 
-export function get(noteId: String) {
-  return {} as Note;
+export async function find(noteId: String) {
+  return await SQL.DB.selectFrom("notes")
+    .selectAll()
+    .where("note_id", "=", noteId)
+    .executeTakeFirst();
 }
 
 export async function list() {
