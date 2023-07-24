@@ -7,7 +7,7 @@ import HelloWorld from './components/HelloWorld.vue'
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/deep-notes-logo.png" width="125" height="125" />
 
-    <div class="container">
+    <div class="container mx-auto px-2">
       <HelloWorld msg="Deep Notes" />
 
       <nav>
@@ -18,7 +18,9 @@ import HelloWorld from './components/HelloWorld.vue'
     </div>
   </header>
 
-  <RouterView />
+  <main class="container mx-auto px-2">
+    <RouterView />
+  </main>
 </template>
 
 <style scoped>

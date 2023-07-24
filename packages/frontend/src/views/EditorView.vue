@@ -3,7 +3,5 @@ import NoteEditor from '@/components/NoteEditor.vue'
 </script>
 
 <template>
-  <main>
-    <NoteEditor />
-  </main>
+  <NoteEditor />
 </template>
