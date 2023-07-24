@@ -1,6 +1,6 @@
 import { RDSData } from "@aws-sdk/client-rds-data";
 import { RDS } from "sst/node/rds";
-import { Kysely, Selectable } from "kysely";
+import { Kysely, Selectable, CamelCasePlugin } from "kysely";
 import { DataApiDialect } from "kysely-data-api";
 import type { Database } from "./sql.generated";
 
@@ -14,6 +14,7 @@ export const DB = new Kysely<Database>({
       client: new RDSData({}),
     },
   }),
+  plugins: [new CamelCasePlugin()],
 });
 
 export type Row = {
