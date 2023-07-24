@@ -9,7 +9,10 @@ beforeEach(async () => {
 describe("Notes", () => {
   it("create a note", async () => {
     // Create a new note
-    const note = await Notes.create("some title", "user1");
+    const note = await Notes.create({
+      title: "some title",
+      createdBy: "user1",
+    });
 
     // List all notes
     const list = await Notes.list();
@@ -18,7 +21,10 @@ describe("Notes", () => {
   });
 
   it("remove a note", async () => {
-    const note = await Notes.create("some title", "user1");
+    const note = await Notes.create({
+      title: "some title",
+      createdBy: "user1",
+    });
 
     const result = await Notes.remove(note.noteId);
 
@@ -30,7 +36,10 @@ describe("Notes", () => {
   });
 
   it("find a note", async () => {
-    const note = await Notes.create("some title", "user1");
+    const note = await Notes.create({
+      title: "some title",
+      createdBy: "user1",
+    });
 
     const result = await Notes.find(note.noteId);
     expect(result).toEqual(note);

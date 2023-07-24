@@ -11,13 +11,13 @@ interface Note {
   createdBy: String;
 }
 
-export async function create(title: String, createdBy: String): Promise<Note> {
+export async function create(note: {
+  title: String;
+  createdBy: String;
+}): Promise<Note> {
+  const newNote = { noteId: ulid(), ...note };
   const [result] = await SQL.DB.insertInto("notes")
-    .values({
-      note_id: ulid(),
-      created_by: createdBy,
-      title: title,
-    })
+    .values(newNote)
     .returningAll()
     .execute();
   return result;
