@@ -6,10 +6,12 @@ A realtime collaborative notes platform on AWS [Serverless Stack](https://sst.de
 
 This app is divided into 3 packages
 
+```
 packages
 ├── core
 ├── frontend
 └── functions
+```
 
 `core` package contains the domain logic for creating, updating, and listing notes
 
@@ -24,18 +26,56 @@ for binding serveless stack together securely to work as a single application.
 
 ## Architecture
 
-This app implements serverless architecture and follows domain driven principle.
+This app is implemented using serverless technologies and follows domain driven design.
 
 The following technologies are employed
-- Aurora Serverless (Postgres)
-- API Gateway V2
-- Lambda functions
-- VueJS
-- Pinia
-- Ably Realtime
-- AWS Amplify
-- Cognito User Pools
-- Tailwind CSS
+- [Aurora Serverless](https://aws.amazon.com/rds/aurora/serverless/) (Postgres)
+- [API Gateway](https://aws.amazon.com/api-gateway/)
+- [AWS Lambda](https://aws.amazon.com/lambda/)
+- [VueJS](https://vuejs.org/)
+- [Pinia](https://pinia.vuejs.org/)
+- [Ably Realtime](https://ably.com/)
+- [AWS Amplify Vue UI](https://ui.docs.amplify.aws/vue/getting-started/introduction)
+- [Cognito User Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+## Features
+
+- Full SignIn/SingUp workflow including
+  - [x] Registration
+  - [x] Email verification
+  - [x] Password chhecking
+  - [x] Forgot password
+- Notes API
+  - [x] List notes
+  - [x] Get single note
+  - [x] Create note
+  - [ ] Update note
+  - [ ] Delete note
+- Notes UI
+  - [x] List notes
+  - [x] Get single note
+  - [ ] Create note
+  - [ ] Update note
+  - [ ] Delete note
+- Realtime
+  - [x] Connetion to Ably
+  - [x] Realtime character updates to all participants
+  - [x] AvatarStack to show all participants
+  - [x] Indicator to show realtime connection
+  - [x] Indicator for participants who left collaboration
+  - [ ] Realtime cursors for all participants
+- Authorization
+  - [x] JWT based authorisation for all API endpoints
+- Editor
+  - [x] Quill
+- Conflict resolution
+  - [ ] CRDT (Conflict-free Replicated Data Type)
+- CI/CD
+  - [x] Local test setup
+  - [ ] CI Test setup
+  - [ ] Feature branch deployment
+  - [ ] Main branch deployment
 
 ## Deployment
 
