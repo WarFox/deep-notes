@@ -5,10 +5,13 @@ import { Auth } from 'aws-amplify'
 export const useAuthStore = defineStore('auth', () => {
   const jwt = ref()
 
-  Auth.currentSession().then((session) => {
+  const getJwtToken = async () => {
+    const session = await Auth.currentSession()
     const accessToken = session.getAccessToken()
     jwt.value = accessToken.getJwtToken()
-  })
+  }
+
+  getJwtToken()
 
   return {
     jwt
