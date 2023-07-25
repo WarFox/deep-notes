@@ -1,6 +1,7 @@
 <template>
   <h1>Notes</h1>
 
+  <button @click="store.fetchNotes()">Refresh</button>
   <LoadingIndicator v-if="isLoading" />
 
   <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -53,5 +54,4 @@ const notes = computed(() => store.notes)
 
 const isLoading = computed(() => notes.value == undefined)
 
-store.fetchNotes()
 </script>
