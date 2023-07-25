@@ -40,7 +40,8 @@ router.beforeEach(async (to, from) => {
     // make sure the user is authenticated
     store.route !== 'authenticated' &&
     // ❗️ Avoid an infinite redirect
-    to.name !== 'home'
+    to.name !== 'home' &&
+    to.name !== 'about'
   ) {
     // redirect the user to the login page
     return { name: 'home' }

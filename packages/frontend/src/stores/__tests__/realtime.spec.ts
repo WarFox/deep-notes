@@ -79,7 +79,6 @@ describe('Realtime Store', () => {
 
     store.participantLeft('someid')
 
-    console.log(store.participants.get('someid'))
     expect(store.participants.get('someid').isConnected).toBe(false)
   })
 
