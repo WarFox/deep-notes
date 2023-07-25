@@ -120,6 +120,13 @@ watch(isConnected, () => {
   }
 })
 
+// Update editor content with noteData
+watch(noteData, (newData) => {
+  if (newData.content) {
+    content.value = new Delta().insert(newData.content)
+  }
+})
+
 onMounted(async () => {
   await realtime.initializeAbly()
 
