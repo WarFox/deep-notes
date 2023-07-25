@@ -1,6 +1,7 @@
 <template>
-  <div class="m-5 font-sans">
-    <div class="flex -space-x-2 justify-end">
+  <!-- AvatarStacks -->
+  <span class="font-sans">
+    <span class="flex -space-x-2 justify-end">
       <div
         v-for="avatar in avatars"
         :key="avatar.clientId"
@@ -20,8 +21,8 @@
                  href="#"
                  >+6</a
                  > -->
-    </div>
-  </div>
+    </span>
+  </span>
 </template>
 
 <script setup lang="ts">

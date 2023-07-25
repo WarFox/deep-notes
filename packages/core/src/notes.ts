@@ -12,38 +12,39 @@ interface Note {
 }
 
 export async function create(note: {
-  createdBy: String;
   title: String;
-  content: String;
-}) {
+  createdBy: String;
+}): Promise<Note> {
+  const newNote = { noteId: ulid(), ...note };
   const [result] = await SQL.DB.insertInto("notes")
-    .values({
-      note_id: ulid(),
-      created_by: note.createdBy,
-      title: note.title,
-      content: note.content,
-    })
+    .values(newNote)
     .returningAll()
     .execute();
   return result;
 }
 
-export function remove(noetId: String) {
+export async function remove(noteId: String) {
+  const result = await SQL.DB.deleteFrom("notes")
+    .where("notes.note_id", "=", noteId)
+    .executeTakeFirst();
+  return result.numDeletedRows;
+}
+
+export function updateTitle(noteId: String, title: String) {
   return undefined;
 }
 
-export function update(note: {
-  noetId: String;
-  userId: String;
-  content: String;
-}) {
+export function updateContent(noteId: String, content: String) {
   return undefined;
 }
 
-export function get(noteId: String) {
-  return {} as Note;
+export async function find(noteId: String) {
+  return await SQL.DB.selectFrom("notes")
+    .selectAll()
+    .where("note_id", "=", noteId)
+    .executeTakeFirst();
 }
 
-export function list() {
-  return [] as Note[];
+export async function list() {
+  return await SQL.DB.selectFrom("notes").selectAll().limit(10).execute();
 }

@@ -8,8 +8,8 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Notes {
   note_id: string;
-  title: string;
-  content: string;
+  title: string | null;
+  content: string | null;
   created_at: Generated<Timestamp>;
   created_by: string;
 }

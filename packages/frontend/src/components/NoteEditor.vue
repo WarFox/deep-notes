@@ -1,28 +1,25 @@
 <template>
-  <main class="px-2">
+  <!-- Connection indicator -->
+  <span
+    class="flex w-2 h-2 rounded-full"
+    :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
+  ></span>
 
-    <!-- Connection indicator -->
-    <span
-      class="flex w-2 h-2 rounded-full"
-      :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
-    ></span>
+  <AvatarStacks />
 
-    <AvatarStacks />
-
-    <div v-if="isLoading" class="text-center">
-      <LoadingIndicator />
-    </div>
-    <div v-else class="my-2">
-      <QuillEditor
-        ref="editor"
-        content-type="delta"
-        @textChange="handleTextChange"
-        @selectionChange="handleSelectionChange"
-        @ready="handleReady"
-        :options="options"
-      />
-    </div>
-  </main>
+  <div v-if="isLoading" class="text-center">
+    <LoadingIndicator />
+  </div>
+  <div v-else class="my-2">
+    <QuillEditor
+      ref="editor"
+      content-type="delta"
+      @textChange="handleTextChange"
+      @selectionChange="handleSelectionChange"
+      @ready="handleReady"
+      :options="options"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">

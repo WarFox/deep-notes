@@ -7,8 +7,8 @@ export async function up(db) {
   await db.schema
     .createTable("notes")
     .addColumn("note_id", "varchar", (col) => col.primaryKey())
-    .addColumn("title", "varchar", (col) => col.notNull())
-    .addColumn("content", "text", (col) => col.notNull())
+    .addColumn("title", "varchar")
+    .addColumn("content", "text")
     .addColumn("created_at", "timestamp", (col) =>
       col.notNull().defaultTo(sql`now()`)
     )

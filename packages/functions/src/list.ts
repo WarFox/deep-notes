@@ -1,8 +1,26 @@
 import { Notes } from "@deep-notes/core/notes";
+import {
+  APIGatewayProxyResultV2,
+  APIGatewayProxyHandlerV2,
+  APIGatewayProxyEventV2,
+} from "aws-lambda";
 
-export async function handler() {
-  return {
-    statusCode: 200,
-    body: Notes.list(),
-  };
-}
+export const handler: APIGatewayProxyHandlerV2 = async (
+  event: APIGatewayProxyEventV2
+): Promise<APIGatewayProxyResultV2> => {
+  try {
+    const result = await Notes.list();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result),
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "some error happened while listing notes",
+      }),
+    };
+  }
+};
