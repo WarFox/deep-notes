@@ -1,7 +1,9 @@
 <template>
   <h1>Notes</h1>
 
-  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+  <LoadingIndicator v-if="isLoading" />
+
+  <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left text-neutral-500 dark:text-neutral-400">
       <thead
         class="text-xs text-neutral-700 uppercase bg-neutral-50 dark:bg-neutral-700 dark:text-neutral-400"
@@ -42,12 +44,14 @@
 
 <script setup lang="ts">
 import { useNoteStore } from '@/stores/notes'
-
 import { computed } from 'vue'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 
 const store = useNoteStore()
 
 const notes = computed(() => store.notes)
+
+const isLoading = computed(() => notes.value == undefined)
 
 store.fetchNotes()
 </script>
