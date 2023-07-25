@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+
+import { useAuthenticator } from '@aws-amplify/ui-vue'
+const auth = useAuthenticator()
 </script>
 
 <template>
@@ -12,7 +15,7 @@ import HelloWorld from './components/HelloWorld.vue'
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/notes">Notes</RouterLink>
+        <RouterLink v-if="auth.route === 'authenticated'" to="/notes">Notes</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>
