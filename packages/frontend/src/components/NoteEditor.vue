@@ -11,8 +11,24 @@
     <LoadingIndicator />
   </div>
   <div v-else class="my-2">
+    <div class="relative shadow-md">
+      <div class="flex items-center justify-between pb-2 bg-white dark:bg-neutral-900">
+        <div>
+          <h1 v-if="noteData" class="px-2 text-neutral-400 text-lg">{{ noteData.title }}</h1>
+        </div>
+        <div class="relative">
+          <button
+            @click="saveNote"
+            class="px-2 mx-2 text-neutral-900 dark:bg-neutral-400 hover:bg-neutral-200"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
     <QuillEditor
       ref="editor"
+      v-model:content="content"
       content-type="delta"
       @textChange="handleTextChange"
       @selectionChange="handleSelectionChange"
@@ -29,17 +45,27 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Types, Realtime } from 'ably'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import AvatarStacks from '@/components/AvatarStacks.vue'
+import { useRoute } from 'vue-router'
 
 import { useRealtimeStore } from '@/stores/realtime'
+import { useNoteStore } from '@/stores/notes'
+
+const route = useRoute()
+const realtime = useRealtimeStore()
+const notes = useNoteStore()
+
+const noteId = ref(route.params.id)
+const noteData = ref()
+
+const content = ref()
 
 // The ref=editor in QuillEditor works like magic!
 const editor = ref(null)
 const quill = ref<Quill>(null)
 
-const store = useRealtimeStore()
-const channel = computed(() => store.channel)
+const channel = computed(() => realtime.channel)
 
-const isConnected = computed(() => store.isConnected && store.isChannelAttached)
+const isConnected = computed(() => realtime.isConnected && realtime.isChannelAttached)
 const isLoading = computed(() => !isConnected)
 
 const options = {
@@ -52,6 +78,10 @@ interface TextChange {
   delta: Delta
   oldContents: Delta
   source: Sources
+}
+
+function saveNote() {
+  // save note
 }
 
 // TODO set the content of editor with content saved in database
@@ -71,7 +101,7 @@ function handleTextChange(change: TextChange) {
  */
 function handleSelectionChange({ range, oldRange, source }) {
   if (range && source == 'user') {
-    const data = { color: store.color, range }
+    const data = { color: realtime.color, range }
     channel.value.presence.update(data)
   }
 }
@@ -80,23 +110,32 @@ function handleSelectionChange({ range, oldRange, source }) {
 watch(isConnected, () => {
   if (isConnected) {
     channel.value.subscribe('delta', (message: Types.Message) => {
-      if (message.clientId !== store.ablyClientId) {
+      if (message.clientId !== realtime.ablyClientId) {
         quill.value.updateContents(message.data)
       }
     })
 
     // setup presence immediately after connection
-    store.setupPresence()
+    realtime.setupPresence()
   }
 })
 
-onMounted(() => {
-  store.initializeAbly()
+// Update editor content with noteData
+watch(noteData, (newData) => {
+  if (newData.content) {
+    content.value = new Delta().insert(newData.content)
+  }
+})
+
+onMounted(async () => {
+  await realtime.initializeAbly()
+
+  noteData.value = await notes.fetchNote(noteId.value)
 
   window.addEventListener('beforeunload', (event) => {
     // on the navigation type checking refresh or close tab/browser for logout
     if (performance.navigation.type != 1) {
-      store.disconnectAbly() // gracefully disconnect before closing window
+      realtime.disconnectAbly() // gracefully disconnect before closing window
     }
 
     return false
@@ -104,11 +143,12 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  store.disconnectAbly()
+  realtime.disconnectAbly()
 })
 
 /* References
    https://quilljs.com/docs/api/#events
    https://github.com/vueup/vue-quill/issues/188
+   https://www.velotio.com/engineering-blog/build-collaborative-editor-using-quill-and-yjs
 */
 </script>
