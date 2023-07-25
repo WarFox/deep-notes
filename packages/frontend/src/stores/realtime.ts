@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 import { Realtime, Types } from 'ably'
 
+import { useAuthStore } from './auth'
+
 interface Participant {
   clientId: String
   color: String
@@ -15,7 +17,10 @@ function getRandomColor(): string {
 }
 
 export const useRealtimeStore = defineStore('realtime', () => {
-  const authUrl = ref(`${import.meta.env.VITE_APP_API_URL}/ably-token`)
+  const authUrl = `${import.meta.env.VITE_APP_API_URL}/ably-token`
+
+  // this is for authenication with coginito
+  const auth = useAuthStore()
 
   const isConnected = ref(false)
   const ablyRealtimeClient = ref<Realtime>()
@@ -60,10 +65,11 @@ export const useRealtimeStore = defineStore('realtime', () => {
   }
 
   async function initializeAbly() {
-    if (!isConnected.value) {
+    if (!isConnected.value && auth.jwt) {
       const clientOptions: Types.ClientOptions = {
-        authUrl: authUrl.value,
-        authMethod: 'POST'
+        authUrl,
+        authMethod: 'POST',
+        authHeaders: { Authorization: `Bearer ${auth.jwt}` }
         // log: { level: 4 }
       }
 

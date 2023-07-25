@@ -1,18 +1,15 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
-import { Auth, API } from 'aws-amplify'
+import { ref, computed, watch } from 'vue'
+import { useAuthStore } from './auth'
 
 export const useNoteStore = defineStore('notes', () => {
   const url = `${import.meta.env.VITE_APP_API_URL}/notes`
 
-  const jwt = ref()
+  const auth = useAuthStore()
+
+  const jwt = computed(() => auth.jwt)
 
   const notes = ref<[]>()
-
-  Auth.currentSession().then((session) => {
-    const accessToken = session.getAccessToken()
-    jwt.value = accessToken.getJwtToken()
-  })
 
   async function fetchNotes() {
     if (jwt.value) {
@@ -27,8 +24,8 @@ export const useNoteStore = defineStore('notes', () => {
     }
   }
 
+  // fetch notes as soon as jwt token is available
   watch(jwt, () => {
-    // fetch notes as soon as jwt token is available
     fetchNotes()
   })
 
