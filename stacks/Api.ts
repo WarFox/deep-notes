@@ -15,6 +15,11 @@ export function Api({ stack }: StackContext) {
 
   // Create a HTTP API
   const api = new ApiGateway(stack, "Api", {
+    cors: {
+      allowMethods: ["ANY"],
+      allowHeaders: ["Authorization"],
+      allowOrigins: ["*"],
+    },
     authorizers: {
       jwt: {
         type: "user_pool",
