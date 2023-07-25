@@ -11,7 +11,21 @@
     <LoadingIndicator />
   </div>
   <div v-else class="my-2">
-    <h1 class="text-lg">{{ noteData.title }}</h1>
+    <div class="relative shadow-md">
+      <div class="flex items-center justify-between pb-2 bg-white dark:bg-neutral-900">
+        <div>
+          <h1 v-if="noteData" class="px-2 text-neutral-400 text-lg">{{ noteData.title }}</h1>
+        </div>
+        <div class="relative">
+          <button
+            @click="saveNote"
+            class="px-2 mx-2 text-neutral-900 dark:bg-neutral-400 hover:bg-neutral-200"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
     <QuillEditor
       ref="editor"
       v-model:content="content"
@@ -41,8 +55,7 @@ const realtime = useRealtimeStore()
 const notes = useNoteStore()
 
 const noteId = ref(route.params.id)
-
-const noteData = computed(() => notes.noteData)
+const noteData = ref()
 
 const content = ref()
 
@@ -65,6 +78,10 @@ interface TextChange {
   delta: Delta
   oldContents: Delta
   source: Sources
+}
+
+function saveNote() {
+  // save note
 }
 
 // TODO set the content of editor with content saved in database
@@ -103,10 +120,10 @@ watch(isConnected, () => {
   }
 })
 
-onMounted(() => {
-  realtime.initializeAbly()
+onMounted(async () => {
+  await realtime.initializeAbly()
 
-  notes.fetchNote(noteId.value)
+  noteData.value = await notes.fetchNote(noteId.value)
 
   window.addEventListener('beforeunload', (event) => {
     // on the navigation type checking refresh or close tab/browser for logout

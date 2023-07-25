@@ -10,7 +10,6 @@ export const useNoteStore = defineStore('notes', () => {
   const jwt = computed(() => auth.jwt)
 
   const notes = ref<[]>()
-  const noteData = ref()
 
   async function fetchNotes() {
     if (jwt.value) {
@@ -33,8 +32,7 @@ export const useNoteStore = defineStore('notes', () => {
         }
       })
 
-      const data = await response.json()
-      noteData.value = data
+      return await response.json()
     }
   }
 
@@ -45,7 +43,6 @@ export const useNoteStore = defineStore('notes', () => {
 
   return {
     notes,
-    noteData,
     fetchNotes,
     fetchNote
   }
