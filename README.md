@@ -55,7 +55,7 @@ The following technologies are employed
 - Notes UI
   - [x] List notes
   - [x] Get single note
-  - [ ] Create note
+  - [x] Create note
   - [ ] Update note
   - [ ] Delete note
 - Realtime

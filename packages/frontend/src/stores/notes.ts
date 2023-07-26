@@ -36,6 +36,25 @@ export const useNoteStore = defineStore('notes', () => {
     }
   }
 
+  async function createNote(title: String) {
+    if (jwt.value) {
+      const response = await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt.value}`
+        },
+        body: JSON.stringify({ title })
+      })
+
+      const data = await response.json()
+      if (response.status === 201) {
+        notes.value.push(data)
+      }
+    }
+  }
+
   // fetch notes as soon as jwt token is available
   watch(jwt, () => {
     fetchNotes()
@@ -44,6 +63,7 @@ export const useNoteStore = defineStore('notes', () => {
   return {
     notes,
     fetchNotes,
-    fetchNote
+    fetchNote,
+    createNote
   }
 })

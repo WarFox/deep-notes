@@ -17,7 +17,7 @@ export function Api({ stack }: StackContext) {
   const api = new ApiGateway(stack, "Api", {
     cors: {
       allowMethods: ["ANY"],
-      allowHeaders: ["Authorization"],
+      allowHeaders: ["Authorization", "Content-Type"],
       allowOrigins: ["*"],
     },
     authorizers: {
