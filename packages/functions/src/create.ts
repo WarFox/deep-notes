@@ -11,14 +11,23 @@ export const handler: APIGatewayProxyHandlerV2 = async (
   try {
     const { body } = event;
 
-    const data = JSON.parse(body);
+    const user = event.requestContext.authorizer?.jwt.claims.sub;
+    if (user) {
+      const data = JSON.parse(body);
 
-    const result = await Notes.create(data);
+      const result = await Notes.create({ ...data, createdBy: user });
+
+      return {
+        statusCode: 201,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(result),
+      };
+    }
 
     return {
-      statusCode: 201,
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(result),
+      statusCode: 204, // no-content
     };
   } catch (err) {
     console.log(err);
