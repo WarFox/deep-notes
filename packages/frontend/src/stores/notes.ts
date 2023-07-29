@@ -2,6 +2,14 @@ import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { useAuthStore } from './auth'
 
+interface Note {
+  noteId: String
+  title: String
+  content: String
+  createdAt: Date
+  createdBy: String
+}
+
 export const useNoteStore = defineStore('notes', () => {
   const url = `${import.meta.env.VITE_APP_API_URL}/notes`
 
@@ -9,7 +17,16 @@ export const useNoteStore = defineStore('notes', () => {
 
   const jwt = computed(() => auth.jwt)
 
-  const notes = ref<[]>()
+  const notes = ref<Note[]>()
+
+  async function findNote(noteId: String) {
+    const note = notes.value.find((n) => n.noteId === noteId)
+    if (note) {
+      return note
+    } else {
+      return await fetchNote(noteId)
+    }
+  }
 
   async function fetchNotes() {
     if (jwt.value) {
@@ -62,8 +79,8 @@ export const useNoteStore = defineStore('notes', () => {
 
   return {
     notes,
+    findNote,
     fetchNotes,
-    fetchNote,
     createNote
   }
 })

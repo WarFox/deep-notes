@@ -128,7 +128,7 @@ watch(noteData, (newData) => {
 })
 
 onMounted(async () => {
-  noteData.value = await notes.fetchNote(noteId.value)
+  noteData.value = await notes.findNote(noteId.value)
 
   window.addEventListener('beforeunload', (event) => {
     // on the navigation type checking refresh or close tab/browser for logout
