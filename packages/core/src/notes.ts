@@ -41,7 +41,7 @@ export function updateContent(noteId: String, content: String) {
 export async function find(noteId: String) {
   return await SQL.DB.selectFrom("notes")
     .selectAll()
-    .where("note_id", "=", noteId)
+    .where("notes.note_id", "=", noteId)
     .executeTakeFirst();
 }
 
