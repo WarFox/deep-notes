@@ -110,6 +110,9 @@ export const useRealtimeStore = defineStore('realtime', () => {
     })
   }
 
+  // initializeAbly when store in initialized
+  initializeAbly()
+
   return {
     ablyClientId,
     addParticipant,

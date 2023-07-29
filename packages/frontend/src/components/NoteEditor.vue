@@ -128,8 +128,6 @@ watch(noteData, (newData) => {
 })
 
 onMounted(async () => {
-  await realtime.initializeAbly()
-
   noteData.value = await notes.fetchNote(noteId.value)
 
   window.addEventListener('beforeunload', (event) => {
