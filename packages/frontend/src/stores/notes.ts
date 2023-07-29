@@ -17,6 +17,8 @@ export const useNoteStore = defineStore('notes', () => {
 
   const jwt = computed(() => auth.jwt)
 
+  const newlyCreatedNote = ref<Note>()
+
   const notes = ref<Note[]>()
 
   async function findNote(noteId: String) {
@@ -68,6 +70,7 @@ export const useNoteStore = defineStore('notes', () => {
       const data = await response.json()
       if (response.status === 201) {
         notes.value.push(data)
+        newlyCreatedNote.value = data
       }
     }
   }
@@ -78,9 +81,10 @@ export const useNoteStore = defineStore('notes', () => {
   })
 
   return {
-    notes,
+    createNote,
     findNote,
     fetchNotes,
-    createNote
+    newlyCreatedNote,
+    notes
   }
 })
