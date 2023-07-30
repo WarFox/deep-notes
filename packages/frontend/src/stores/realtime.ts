@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import { Realtime, Types } from 'ably'
 
@@ -22,14 +22,11 @@ export const useRealtimeStore = defineStore('realtime', () => {
   // this is for authenication with coginito
   const auth = useAuthStore()
 
-  const isConnected = ref(false)
   const ablyRealtimeClient = ref<Realtime>()
-  const ablyClientId = ref('noclientid')
+  const ablyClientId = ref<String>()
 
   const channelName = 'editor'
-  const channel = ref()
-
-  const isChannelAttached = ref(false)
+  const channel = ref<Types.RealtimeChannelCallbacks>()
 
   const color = ref(getRandomColor())
   const participants = ref(new Map<String, Participant>())
@@ -48,24 +45,24 @@ export const useRealtimeStore = defineStore('realtime', () => {
   }
 
   function _connected(realtime: Realtime) {
-    isConnected.value = true
     ablyClientId.value = realtime.auth.clientId
     ablyRealtimeClient.value = realtime
 
-    // attach channel
+    // TODO: Get separate channel per noteId
+    // creates new channel or returns existing channel
     channel.value = realtime.channels.get(channelName, {
       // params: { rewind: '2m' }
     })
-    isChannelAttached.value = true
   }
 
   function _disconnected() {
-    isConnected.value = false
-    isChannelAttached.value = false
+    console.debug('ably disconnected')
+    ablyClientId.value = undefined
+    channel.value = undefined
   }
 
   async function initializeAbly() {
-    if (!isConnected.value && auth.jwt) {
+    if (!ablyClientId.value && auth.jwt) {
       const clientOptions: Types.ClientOptions = {
         authUrl,
         authMethod: 'POST',
@@ -83,8 +80,6 @@ export const useRealtimeStore = defineStore('realtime', () => {
 
   function disconnectAbly() {
     ablyRealtimeClient.value.connection.close()
-    isConnected.value = false
-    isChannelAttached.value = false
   }
 
   function setupPresence() {
@@ -110,6 +105,13 @@ export const useRealtimeStore = defineStore('realtime', () => {
     })
   }
 
+  watch(channel, (channelValue) => {
+    // setup presence immediately after channel is ready
+    if (channelValue) {
+      setupPresence()
+    }
+  })
+
   // initializeAbly when store in initialized
   initializeAbly()
 
@@ -121,10 +123,7 @@ export const useRealtimeStore = defineStore('realtime', () => {
     color,
     disconnectAbly,
     initializeAbly,
-    isChannelAttached,
-    isConnected,
     removeParticipant,
-    participantLeft,
-    setupPresence
+    participantLeft
   }
 })

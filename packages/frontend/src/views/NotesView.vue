@@ -66,17 +66,15 @@
 <script setup lang="ts">
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useNoteStore } from '@/stores/notes'
 import { useRouter } from 'vue-router'
 
 const store = useNoteStore()
 const router = useRouter()
-
-const notes = computed(() => store.notes)
+const { notes, newlyCreatedNote } = storeToRefs(store)
 
 const isLoading = computed(() => notes.value == undefined)
-
-const newlyCreatedNote = computed(() => store.newlyCreatedNote)
 
 const title = ref()
 

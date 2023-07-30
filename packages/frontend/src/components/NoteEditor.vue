@@ -2,7 +2,7 @@
   <!-- Connection indicator -->
   <span
     class="flex w-2 h-2 rounded-full"
-    :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
+    :class="hasConnected ? 'bg-green-500' : 'bg-red-500'"
   ></span>
 
   <AvatarStacks />
@@ -39,16 +39,16 @@
 </template>
 
 <script setup lang="ts">
-import { QuillEditor, Delta, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { Types, Realtime } from 'ably'
-import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import AvatarStacks from '@/components/AvatarStacks.vue'
-import { useRoute } from 'vue-router'
-
-import { useRealtimeStore } from '@/stores/realtime'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import { QuillEditor, Delta, Quill } from '@vueup/vue-quill'
+import { Types, Realtime } from 'ably'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useNoteStore } from '@/stores/notes'
+import { useRealtimeStore } from '@/stores/realtime'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const realtime = useRealtimeStore()
@@ -63,15 +63,15 @@ const content = ref()
 const editor = ref(null)
 const quill = ref<Quill>(null)
 
-const channel = computed(() => realtime.channel)
+const { channel, ablyClientId } = storeToRefs(realtime)
 
-const isConnected = computed(() => realtime.isConnected && realtime.isChannelAttached)
-const isLoading = computed(() => !isConnected)
+const hasConnected = computed(() => ablyClientId.value && channel.value)
+const isLoading = computed(() => !hasConnected)
 
 const options = {
   placeholder: 'Start collaborating! :tada:',
   theme: 'snow',
-  readOnly: !isConnected
+  readOnly: !hasConnected
 }
 
 interface TextChange {
@@ -106,17 +106,18 @@ function handleSelectionChange({ range, oldRange, source }) {
   }
 }
 
-// Subscribe to channel only after channel is attached
-watch(isConnected, () => {
-  if (isConnected) {
-    channel.value.subscribe('delta', (message: Types.Message) => {
-      if (message.clientId !== realtime.ablyClientId) {
-        quill.value.updateContents(message.data)
-      }
-    })
+function subscribeDelta(channel) {
+  channel.subscribe('delta', (message: Types.Message) => {
+    if (message.clientId !== ablyClientId.value) {
+      quill.value.updateContents(message.data)
+    }
+  })
+}
 
-    // setup presence immediately after connection
-    realtime.setupPresence()
+// Subscribe to channel only after channel is attached
+watch(channel, (ch) => {
+  if (ch) {
+    subscribeDelta(ch)
   }
 })
 
