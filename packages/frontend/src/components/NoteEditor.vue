@@ -63,9 +63,12 @@ const content = ref()
 const editor = ref(null)
 const quill = ref<Quill>(null)
 
-const { channel, ablyClientId } = storeToRefs(realtime)
+const { clientId, realtimeClient, channel } = storeToRefs(realtime)
+const { setupPresence, getChannel } = realtime
 
-const hasConnected = computed(() => ablyClientId.value && channel.value)
+const hasConnected = computed(() => {
+  return clientId && clientId.value
+})
 const isLoading = computed(() => !hasConnected)
 
 const options = {
@@ -92,6 +95,7 @@ function handleReady() {
 function handleTextChange(change: TextChange) {
   // only publish changes made by the user
   if (change.source == 'user' && channel.value) {
+    console.log('publish delta')
     channel.value.publish('delta', change.delta)
   }
 }
@@ -106,19 +110,20 @@ function handleSelectionChange({ range, oldRange, source }) {
   }
 }
 
-function subscribeDelta(channel) {
-  channel.subscribe('delta', (message: Types.Message) => {
-    if (message.clientId !== ablyClientId.value) {
+function subscribeDelta() {
+  console.log('subscribe delta')
+  channel.value.subscribe('delta', (message: Types.Message) => {
+    if (message.clientId !== clientId.value) {
       quill.value.updateContents(message.data)
     }
   })
 }
 
 // Subscribe to channel only after channel is attached
-watch(channel, (ch) => {
-  if (ch) {
-    subscribeDelta(ch)
-  }
+watch(clientId, (ch) => {
+    if (ch) {
+        subscribeDelta(ch)
+    }
 })
 
 // Update editor content with noteData
@@ -129,7 +134,13 @@ watch(noteData, (newData) => {
 })
 
 onMounted(async () => {
+  console.log('mounted')
   noteData.value = await notes.findNote(noteId.value)
+
+  // setup Ably presence when editor is mounted
+  // setupPresence()
+
+    // subscribeDelta()
 
   window.addEventListener('beforeunload', (event) => {
     // on the navigation type checking refresh or close tab/browser for logout

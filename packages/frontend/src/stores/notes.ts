@@ -13,7 +13,7 @@ interface Note {
 export const useNoteStore = defineStore('notes', () => {
   const url = `${import.meta.env.VITE_APP_API_URL}/notes`
 
-  const auth = useAuthStore()
+  const auth = { jwt: undefined } //useAuthStore()
 
   const jwt = computed(() => auth.jwt)
 
@@ -40,6 +40,16 @@ export const useNoteStore = defineStore('notes', () => {
 
       const data = await response.json()
       notes.value = data
+    } else {
+      notes.value = [
+        {
+          noteId: 'hello',
+          title: 'hello',
+          content: 'hello',
+          createdBy: 'deepu',
+          createdAt: new Date()
+        }
+      ]
     }
   }
 
@@ -76,9 +86,9 @@ export const useNoteStore = defineStore('notes', () => {
   }
 
   // fetch notes as soon as jwt token is available
-  watch(jwt, () => {
-    fetchNotes()
-  })
+  // watch(jwt, () => {
+  fetchNotes()
+  // })
 
   return {
     createNote,
