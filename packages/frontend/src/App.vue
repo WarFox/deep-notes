@@ -8,14 +8,21 @@ const auth = useAuthenticator()
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/deep-notes-logo.png" width="125" height="125" />
+    <img
+      alt="Deep Notes logo"
+      class="logo"
+      src="@/assets/deep-notes-logo.png"
+      width="125"
+      height="125"
+    />
 
     <div class="container mx-auto px-2">
       <HelloWorld msg="Deep Notes" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink v-if="auth.route === 'authenticated'" to="/notes">Notes</RouterLink>
+        <RouterLink to="/notes">Notes</RouterLink>
+        <!-- <RouterLink v-if="auth.route === 'authenticated'" to="/notes">Notes</RouterLink> -->
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>

@@ -1,5 +1,4 @@
 <template>
-
   <LoadingIndicator v-if="isLoading" />
 
   <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -65,13 +64,15 @@
 </template>
 
 <script setup lang="ts">
-import { useNoteStore } from '@/stores/notes'
-import { computed, ref } from 'vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useNoteStore } from '@/stores/notes'
+import { useRouter } from 'vue-router'
 
 const store = useNoteStore()
-
-const notes = computed(() => store.notes)
+const router = useRouter()
+const { notes, newlyCreatedNote } = storeToRefs(store)
 
 const isLoading = computed(() => notes.value == undefined)
 
@@ -82,4 +83,8 @@ function createNote() {
 
   title.value = ''
 }
+
+watch(newlyCreatedNote, (newNote) => {
+  router.push({ name: 'notes-editor', params: { id: newNote.noteId } })
+})
 </script>

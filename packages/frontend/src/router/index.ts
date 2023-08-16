@@ -33,19 +33,19 @@ const router = createRouter({
   ]
 })
 
-const store = useAuthenticator()
+// const store = useAuthenticator()
 
-router.beforeEach(async (to, from) => {
-  if (
-    // make sure the user is authenticated
-    store.route !== 'authenticated' &&
-    // ❗️ Avoid an infinite redirect
-    to.name !== 'home' &&
-    to.name !== 'about'
-  ) {
-    // redirect the user to the login page
-    return { name: 'home' }
-  }
-})
+// router.beforeEach(async (to, from) => {
+//   if (
+//     // make sure the user is authenticated
+//     store.route !== 'authenticated' &&
+//     // ❗️ Avoid an infinite redirect
+//     to.name !== 'home' &&
+//     to.name !== 'about'
+//   ) {
+//     // redirect the user to the login page
+//     return { name: 'home' }
+//   }
+// })
 
 export default router

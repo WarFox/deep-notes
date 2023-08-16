@@ -26,6 +26,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, watch, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useRealtimeStore } from '@/stores/realtime'
+
 const bgColours = {
   amber: 'bg-amber-400',
   blue: 'bg-blue-400',
@@ -37,20 +41,15 @@ const bgColours = {
   red: 'bg-red-400'
 }
 
-import { useRealtimeStore } from '@/stores/realtime'
-import { computed, watch, ref } from 'vue'
-
 const store = useRealtimeStore()
 
-const participants = computed(() => store.participants.values())
+const { participants } = storeToRefs(store)
 
-const avatars = ref([])
-
-watch(participants, () => {
+const avatars = computed(() => {
   const values = []
-  for (let [key, value] of store.participants) {
+  for (let [key, value] of participants.value) {
     values.push(value)
   }
-  avatars.value = values
+  return values
 })
 </script>

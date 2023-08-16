@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { ulid } from 'ulid'
 
 import { Realtime, Types } from 'ably'
 
-import { useAuthStore } from './auth'
+// import { useAuthStore } from './auth'
 
 interface Participant {
   clientId: String
@@ -20,16 +21,13 @@ export const useRealtimeStore = defineStore('realtime', () => {
   const authUrl = `${import.meta.env.VITE_APP_API_URL}/ably-token`
 
   // this is for authenication with coginito
-  const auth = useAuthStore()
+  // const auth = useAuthStore()
 
-  const isConnected = ref(false)
-  const ablyRealtimeClient = ref<Realtime>()
-  const ablyClientId = ref('noclientid')
+  const realtimeClient = ref<Realtime>()
+  const clientId = ref<String>(ulid())
 
   const channelName = 'editor'
-  const channel = ref()
-
-  const isChannelAttached = ref(false)
+  const channel = ref<Types.RealtimeChannelCallbacks>()
 
   const color = ref(getRandomColor())
   const participants = ref(new Map<String, Participant>())
@@ -47,81 +45,97 @@ export const useRealtimeStore = defineStore('realtime', () => {
     participants.value.set(clientId, { ...participant, ...{ isConnected: false } })
   }
 
-  function _connected(realtime: Realtime) {
-    isConnected.value = true
-    ablyClientId.value = realtime.auth.clientId
-    ablyRealtimeClient.value = realtime
-
-    // attach channel
-    channel.value = realtime.channels.get(channelName, {
-      // params: { rewind: '2m' }
-    })
-    isChannelAttached.value = true
-  }
-
   function _disconnected() {
-    isConnected.value = false
-    isChannelAttached.value = false
+    console.debug('ably disconnected')
+    clientId.value = undefined
+    channel.value = undefined
   }
 
-  async function initializeAbly() {
-    if (!isConnected.value && auth.jwt) {
+  function initializeAbly() {
+    if (!clientId.value) {
       const clientOptions: Types.ClientOptions = {
-        authUrl,
-        authMethod: 'POST',
-        authHeaders: { Authorization: `Bearer ${auth.jwt}` }
+        key: 'cNU_dA.XmF1pg:DCTXe1BlQuQBN_WgbaHDeV8A9Yo_yt90qI55MUN4HaQ',
+        clientId: clientId.value
+        // authUrl,
+        // authMethod: 'POST',
+        // authHeaders: { Authorization: `Bearer ${auth.jwt}` }
         // log: { level: 4 }
       }
 
       const realtime = new Realtime(clientOptions)
 
-      realtime.connection.on('connected', () => _connected(realtime))
+      realtime.connection.on('connected', () => {
+        console.log('realtime connected')
+        clientId.value = realtime.auth.clientId
+        realtimeClient.value = realtime
+
+        // TODO: Get separate channel per noteId
+        // creates new channel or returns existing channel
+        channel.value = realtimeClient.value.channels.get(channelName)
+
+        setupPresence()
+      })
 
       realtime.connection.on('disconnected', () => _disconnected())
     }
   }
 
   function disconnectAbly() {
-    ablyRealtimeClient.value.connection.close()
-    isConnected.value = false
-    isChannelAttached.value = false
+    console.log('ably disconnected')
+    realtimeClient.value.connection.close()
+  }
+
+  function getChannel() {
+    return realtimeClient.value.channels.get(channelName)
   }
 
   function setupPresence() {
+    console.log('setup presense')
     // presence enter
-    channel.value.presence.subscribe(
-      ['enter', 'present', 'update'],
-      (msg: Types.PresenceMessage) => {
-        if (msg.clientId !== ablyClientId.value) {
-          const participant: Participant = {
-            clientId: msg.clientId,
-            color: msg.data.color,
-            isConnected: true
-          }
-          addParticipant(participant)
-        }
-      }
-    )
+    getChannel().presence.enter({
+      clientId: clientId.value,
+      color: color.value,
+      isConnected: true
+    })
 
-    channel.value.presence.subscribe('leave', (msg: Types.PresenceMessage) => {
-      if (msg.clientId !== ablyClientId.value) {
+    getChannel().presence.subscribe(['enter', 'present'], (msg: Types.PresenceMessage) => {
+      if (msg.clientId !== clientId.value) {
+        const participant: Participant = {
+          clientId: msg.clientId,
+          color: msg.data.color,
+          isConnected: true
+        }
+        addParticipant(participant)
+      }
+    })
+
+    getChannel().presence.subscribe(['update'], (msg: Types.PresenceMessage) => {
+      if (msg.clientId !== clientId.value) {
+        // update cursor
+        console.log('update presense/cursor ', msg.clientId)
+      }
+    })
+
+    getChannel().presence.subscribe('leave', (msg: Types.PresenceMessage) => {
+      if (msg.clientId !== clientId.value) {
         participantLeft(msg.clientId)
       }
     })
   }
 
+  // initializeAbly when store in initialized
+  initializeAbly()
+
   return {
-    ablyClientId,
+    clientId,
     addParticipant,
     channel,
+    getChannel,
     participants,
     color,
     disconnectAbly,
-    initializeAbly,
-    isChannelAttached,
-    isConnected,
     removeParticipant,
-    participantLeft,
-    setupPresence
+    realtimeClient,
+    participantLeft
   }
 })

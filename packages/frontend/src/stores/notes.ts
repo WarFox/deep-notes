@@ -2,14 +2,33 @@ import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { useAuthStore } from './auth'
 
+interface Note {
+  noteId: String
+  title: String
+  content: String
+  createdAt: Date
+  createdBy: String
+}
+
 export const useNoteStore = defineStore('notes', () => {
   const url = `${import.meta.env.VITE_APP_API_URL}/notes`
 
-  const auth = useAuthStore()
+  const auth = { jwt: undefined } //useAuthStore()
 
   const jwt = computed(() => auth.jwt)
 
-  const notes = ref<[]>()
+  const newlyCreatedNote = ref<Note>()
+
+  const notes = ref<Note[]>()
+
+  async function findNote(noteId: String) {
+    const note = notes.value.find((n) => n.noteId === noteId)
+    if (note) {
+      return note
+    } else {
+      return await fetchNote(noteId)
+    }
+  }
 
   async function fetchNotes() {
     if (jwt.value) {
@@ -21,6 +40,16 @@ export const useNoteStore = defineStore('notes', () => {
 
       const data = await response.json()
       notes.value = data
+    } else {
+      notes.value = [
+        {
+          noteId: 'hello',
+          title: 'hello',
+          content: 'hello',
+          createdBy: 'deepu',
+          createdAt: new Date()
+        }
+      ]
     }
   }
 
@@ -51,19 +80,21 @@ export const useNoteStore = defineStore('notes', () => {
       const data = await response.json()
       if (response.status === 201) {
         notes.value.push(data)
+        newlyCreatedNote.value = data
       }
     }
   }
 
   // fetch notes as soon as jwt token is available
-  watch(jwt, () => {
-    fetchNotes()
-  })
+  // watch(jwt, () => {
+  fetchNotes()
+  // })
 
   return {
-    notes,
+    createNote,
+    findNote,
     fetchNotes,
-    fetchNote,
-    createNote
+    newlyCreatedNote,
+    notes
   }
 })
