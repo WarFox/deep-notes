@@ -1,50 +1,135 @@
 export * as Notes from "./notes";
 
+import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
+import { Table } from "sst/node/table";
 import { ulid } from "ulid";
-import { SQL } from "./sql";
 
 interface Note {
-  noteId: String;
-  title: String;
-  content: String;
-  createdAt: Date;
-  createdBy: String;
+  // ulid value, lexicographically sortable unique ids
+  noteId: string;
+  userId: string;
+  title: string;
+  content: string;
+  createdAt: number;
 }
 
+// Full DynamoDB Client
+const client = new DynamoDB({});
+
+const ddbDocClient = DynamoDBDocument.from(client);
+
 export async function create(note: {
-  title: String;
-  createdBy: String;
+  title: string;
+  userId: string;
 }): Promise<Note> {
-  const newNote = { noteId: ulid(), ...note };
-  const [result] = await SQL.DB.insertInto("notes")
-    .values(newNote)
-    .returningAll()
-    .execute();
+  const noteId = ulid();
+  const newNote = {
+    ...note,
+    content: "",
+    createdAt: Date.now(),
+  };
+
+  const params = {
+    // Get the table name from the environment variable
+    TableName: Table.Notes.tableName,
+    Item: { ...newNote, PK: "note", SK: noteId },
+  };
+  await ddbDocClient.put(params);
+  const result = { ...newNote, noteId };
   return result;
 }
 
-export async function remove(noteId: String) {
-  const result = await SQL.DB.deleteFrom("notes")
-    .where("notes.note_id", "=", noteId)
-    .executeTakeFirst();
-  return result.numDeletedRows;
+export async function remove(noteId: string) {
+  const params = {
+    // Get the table name from the environment variable
+    TableName: Table.Notes.tableName,
+    // Get the row where the noteId is the one in the path
+    Key: {
+      PK: "note",
+      SK: noteId,
+    },
+  };
+  await ddbDocClient.delete(params);
 }
 
-export function updateTitle(noteId: String, title: String) {
-  return undefined;
+export async function updateTitle(noteId: string, title: string) {
+  const params = {
+    // Get the table name from the environment variable
+    TableName: Table.Notes.tableName,
+    // Get the row where the noteId is the one in the path
+    Key: {
+      PK: "note",
+      SK: noteId,
+    },
+    // Update the "content" column with the one passed in
+    UpdateExpression: "SET title = :title",
+    ExpressionAttributeValues: {
+      ":title": title || null,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const results = await ddbDocClient.update(params);
+  return results.Attributes;
 }
 
-export function updateContent(noteId: String, content: String) {
-  return undefined;
+export async function updateContent(noteId: string, content: string) {
+  const params = {
+    // Get the table name from the environment variable
+    TableName: Table.Notes.tableName,
+    // Get the row where the noteId is the one in the path
+    Key: {
+      PK: "note",
+      SK: noteId,
+    },
+    // Update the "content" column with the one passed in
+    UpdateExpression: "SET content = :content",
+    ExpressionAttributeValues: {
+      ":content": content || null,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const results = await ddbDocClient.update(params);
+  return results.Attributes;
 }
 
-export async function find(noteId: String) {
-  return await SQL.DB.selectFrom("notes")
-    .selectAll()
-    .where("note_id", "=", noteId)
-    .executeTakeFirst();
+export async function find(noteId: string) {
+  const params = {
+    // Get the table name from the environment variable
+    TableName: Table.Notes.tableName,
+    // Get the row where the noteId is the one in the path
+    Key: {
+      PK: "note",
+      SK: noteId,
+    },
+  };
+  const results = await ddbDocClient.get(params);
+  return results.Item;
 }
 
 export async function list() {
-  return await SQL.DB.selectFrom("notes").selectAll().limit(10).execute();
+  const params = {
+    // Get the table name from the environment variable
+    TableName: Table.Notes.tableName,
+    // Get all the rows where
+    KeyConditionExpression: "PK = :pk",
+    ExpressionAttributeValues: {
+      ":pk": "note",
+    },
+  };
+  const results = await ddbDocClient.query(params);
+
+  const notes = results.Items?.map((item) => {
+    return {
+      content: item.content,
+      noteId: item.SK,
+      userId: item.userId,
+      title: item.title,
+      createdAt: item.createdAt,
+    };
+  });
+
+  return notes;
 }

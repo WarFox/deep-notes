@@ -1,13 +1,11 @@
 import './assets/style.css'
 
-import { createApp } from 'vue'
+import { Amplify } from 'aws-amplify'
 import { createPinia } from 'pinia'
-
+import { createApp } from 'vue'
 import App from './App.vue'
+import { getAccessTokenJwt } from './lib/auth.ts'
 import router from './router'
-
-// import { Amplify } from 'aws-amplify'
-import { Amplify } from '@aws-amplify/core'
 
 Amplify.configure({
   Auth: {
@@ -18,7 +16,12 @@ Amplify.configure({
     endpoints: [
       {
         name: 'api',
-        endpoint: import.meta.env.VITE_APP_API_URL
+        endpoint: import.meta.env.VITE_APP_API_URL,
+        custom_header: async () => {
+          return {
+            Authorization: `Bearer ${await getAccessTokenJwt()}`
+          }
+        }
       }
     ]
   }

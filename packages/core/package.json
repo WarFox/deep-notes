@@ -12,9 +12,8 @@
     "vitest": "^0.33.0"
   },
   "dependencies": {
-    "@aws-sdk/client-rds-data": "^3.370.0",
-    "kysely": "^0.26.1",
-    "kysely-data-api": "^0.2.1",
+    "@aws-sdk/client-dynamodb": "^3.395.0",
+    "@aws-sdk/lib-dynamodb": "^3.395.0",
     "ulid": "^2.3.0"
   }
 }

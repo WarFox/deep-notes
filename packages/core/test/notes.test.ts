@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Notes } from "../src/notes";
-import { SQL } from "../src/sql";
 
 beforeEach(async () => {
-  SQL.DB.deleteFrom("notes").execute();
+  // clear db
 });
 
 describe("Notes", () => {
@@ -11,7 +10,7 @@ describe("Notes", () => {
     // Create a new note
     const note = await Notes.create({
       title: "some title",
-      createdBy: "user1",
+      userId: "user1",
     });
 
     // List all notes
@@ -23,7 +22,7 @@ describe("Notes", () => {
   it("remove a note", async () => {
     const note = await Notes.create({
       title: "some title",
-      createdBy: "user1",
+      userId: "user1",
     });
 
     const result = await Notes.remove(note.noteId);
@@ -38,12 +37,10 @@ describe("Notes", () => {
   it("find a note", async () => {
     const note = await Notes.create({
       title: "some title",
-      createdBy: "user1",
+      userId: "user1",
     });
 
     const result = await Notes.find(note.noteId);
     expect(result).toEqual(note);
-  });
-
   });
 });

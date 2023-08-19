@@ -1,12 +1,20 @@
-import { RDS, StackContext } from "sst/constructs";
+import { StackContext, Table } from "sst/constructs";
 
 export function Database({ stack }: StackContext) {
-  const rds = new RDS(stack, "db", {
-    engine: "postgresql11.13",
-    defaultDatabaseName: "main",
-    migrations: "packages/core/migrations",
-    types: "packages/core/src/sql.generated.ts",
+  const table = new Table(stack, "Notes", {
+    fields: {
+      PK: "string",
+      SK: "string",
+      noteId: "string",
+      userId: "string",
+      firstName: "string",
+      lastName: "string",
+      title: "string",
+      content: "string",
+      createdAt: "number",
+    },
+    primaryIndex: { partitionKey: "PK", sortKey: "SK" },
   });
 
-  return rds;
+  return table;
 }

@@ -29,7 +29,8 @@ for binding serveless stack together securely to work as a single application.
 This app is implemented using serverless technologies and follows domain driven design.
 
 The following technologies are employed
-- [Aurora Serverless](https://aws.amazon.com/rds/aurora/serverless/) (Postgres)
+- ~~[Aurora Serverless](https://aws.amazon.com/rds/aurora/serverless/) (Postgres)~~
+- [DynamoDB](https://aws.amazon.com/dynamodb/)
 - [API Gateway](https://aws.amazon.com/api-gateway/)
 - [AWS Lambda](https://aws.amazon.com/lambda/)
 - [VueJS](https://vuejs.org/)
