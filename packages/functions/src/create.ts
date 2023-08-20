@@ -13,7 +13,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (
 
     const user = event.requestContext.authorizer?.jwt.claims.sub;
     if (user) {
-      const data = JSON.parse(body);
+      const data = JSON.parse(body || "{}");
 
       const result = await Notes.create({ ...data, createdBy: user });
 
