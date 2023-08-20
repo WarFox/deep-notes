@@ -1,67 +1,52 @@
+import { API } from 'aws-amplify'
 import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
-import { useAuthStore } from './auth'
+import { ref } from 'vue'
+
+interface Note {
+  noteId: string
+  userId: string
+  title: string
+  content: string
+  createdAt: string
+}
 
 export const useNoteStore = defineStore('notes', () => {
-  const url = `${import.meta.env.VITE_APP_API_URL}/notes`
+  const notes = ref<Note[]>()
 
-  const auth = useAuthStore()
-
-  const jwt = computed(() => auth.jwt)
-
-  const notes = ref<[]>()
+  const isLoading = ref(false)
 
   async function fetchNotes() {
-    if (jwt.value) {
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${jwt.value}`
-        }
-      })
-
-      const data = await response.json()
-      notes.value = data
-    }
+    isLoading.value = true
+    notes.value = await API.get('api', '/notes', {})
+    isLoading.value = false
   }
 
-  async function fetchNote(noteId: String) {
-    if (jwt.value) {
-      const response = await fetch(`${url}/${noteId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt.value}`
-        }
-      })
-
-      return await response.json()
-    }
+  async function fetchNote(noteId: string) {
+    isLoading.value = true
+    const note = await API.get('api', `/notes/${noteId}`, {})
+    isLoading.value = false
+    return note
   }
 
-  async function createNote(title: String) {
-    if (jwt.value) {
-      const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${jwt.value}`
-        },
-        body: JSON.stringify({ title })
-      })
-
-      const data = await response.json()
-      if (response.status === 201) {
+  async function createNote(title: string) {
+    isLoading.value = true
+    try {
+      const data = await API.post('api', '/notes', { body: { title } })
+      if (data) {
         notes.value.push(data)
       }
+    } catch (error) {
+      console.log(error)
     }
+    isLoading.value = false
   }
 
-  // fetch notes as soon as jwt token is available
-  watch(jwt, () => {
-    fetchNotes()
-  })
+  // fetch Note when store is created
+  fetchNotes()
 
   return {
     notes,
+    isLoading,
     fetchNotes,
     fetchNote,
     createNote

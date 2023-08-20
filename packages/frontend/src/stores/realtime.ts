@@ -1,9 +1,7 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-
 import { Realtime, Types } from 'ably'
-
-import { useAuthStore } from './auth'
+import { defineStore } from 'pinia'
+import { getAccessTokenJwt } from '../lib/auth'
+import { ref } from 'vue'
 
 interface Participant {
   clientId: String
@@ -18,9 +16,6 @@ function getRandomColor(): string {
 
 export const useRealtimeStore = defineStore('realtime', () => {
   const authUrl = `${import.meta.env.VITE_APP_API_URL}/ably-token`
-
-  // this is for authenication with coginito
-  const auth = useAuthStore()
 
   const isConnected = ref(false)
   const ablyRealtimeClient = ref<Realtime>()
@@ -65,11 +60,11 @@ export const useRealtimeStore = defineStore('realtime', () => {
   }
 
   async function initializeAbly() {
-    if (!isConnected.value && auth.jwt) {
+    if (!isConnected.value) {
       const clientOptions: Types.ClientOptions = {
         authUrl,
         authMethod: 'POST',
-        authHeaders: { Authorization: `Bearer ${auth.jwt}` }
+        authHeaders: { Authorization: `Bearer ${getAccessTokenJwt()}` }
         // log: { level: 4 }
       }
 

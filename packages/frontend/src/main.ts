@@ -1,11 +1,11 @@
 import './assets/style.css'
 
-import { Amplify } from 'aws-amplify'
-import { createPinia } from 'pinia'
-import { createApp } from 'vue'
 import App from './App.vue'
-import { getAccessTokenJwt } from './lib/auth.ts'
 import router from './router'
+import { Amplify } from 'aws-amplify'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import { getAccessTokenJwt } from './lib/auth'
 
 Amplify.configure({
   Auth: {
