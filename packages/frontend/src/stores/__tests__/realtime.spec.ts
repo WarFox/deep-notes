@@ -17,9 +17,13 @@ vi.mock('ably', () => {
   return { Realtime }
 })
 
+vi.mock('../../lib/auth', () => {
+  return { getAccessTokenJwt: vi.fn() }
+})
+
 describe('Realtime Store', () => {
-  let realtime
-  let store
+  let realtime: Realtime = undefined
+  let store = undefined
 
   afterEach(() => {
     vi.clearAllMocks()
