@@ -4,8 +4,8 @@ import { getAccessTokenJwt } from '../lib/auth'
 import { ref } from 'vue'
 
 interface Participant {
-  clientId: String
-  color: String
+  clientId: string
+  color: string
   isConnected: boolean
 }
 
@@ -27,17 +27,17 @@ export const useRealtimeStore = defineStore('realtime', () => {
   const isChannelAttached = ref(false)
 
   const color = ref(getRandomColor())
-  const participants = ref(new Map<String, Participant>())
+  const participants = ref(new Map<string, Participant>())
 
   function addParticipant(participant: Participant) {
     participants.value.set(participant.clientId, participant)
   }
 
-  function removeParticipant(clientId: String) {
+  function removeParticipant(clientId: string) {
     participants.value.delete(clientId)
   }
 
-  function participantLeft(clientId: String) {
+  function participantLeft(clientId: string) {
     const participant = participants.value.get(clientId)
     participants.value.set(clientId, { ...participant, ...{ isConnected: false } })
   }
