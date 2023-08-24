@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { getAccessTokenJwt } from '../lib/auth'
 import { ref } from 'vue'
 
-interface Participant {
+export interface Participant {
   clientId: string
   color: string
   isConnected: boolean
@@ -64,7 +64,7 @@ export const useRealtimeStore = defineStore('realtime', () => {
       const clientOptions: Types.ClientOptions = {
         authUrl,
         authMethod: 'POST',
-        authHeaders: { Authorization: `Bearer ${getAccessTokenJwt()}` }
+        authHeaders: { Authorization: `Bearer ${await getAccessTokenJwt()}` }
         // log: { level: 4 }
       }
 
