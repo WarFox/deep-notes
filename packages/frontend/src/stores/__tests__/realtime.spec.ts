@@ -46,8 +46,8 @@ describe('Realtime Store', () => {
     expect(store.ablyClientId).toBe('noclientid')
   })
 
-  it('initializeAbly', () => {
-    store.initializeAbly()
+  it('initializeAbly', async () => {
+    await store.initializeAbly()
 
     expect(store.participants).toHaveLength(0)
     expect(realtime.connection.on).toHaveBeenCalledTimes(2)
