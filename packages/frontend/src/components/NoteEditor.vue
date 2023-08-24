@@ -5,7 +5,7 @@
     :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
   ></span>
 
-  <AvatarStacks />
+  <AvatarStacks :avatars="avatars" />
 
   <div v-if="isLoading" class="text-center">
     <LoadingIndicator />
@@ -39,16 +39,16 @@
 </template>
 
 <script setup lang="ts">
-import { QuillEditor, Delta, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { Types, Realtime } from 'ably'
-import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import AvatarStacks from '@/components/AvatarStacks.vue'
-import { useRoute } from 'vue-router'
-
-import { useRealtimeStore } from '@/stores/realtime'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import { QuillEditor, Delta, Quill } from '@vueup/vue-quill'
+import { Types, Realtime } from 'ably'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useNoteStore } from '@/stores/notes'
+import { useRealtimeStore } from '@/stores/realtime'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const realtime = useRealtimeStore()
@@ -63,10 +63,18 @@ const content = ref()
 const editor = ref(null)
 const quill = ref<Quill>(null)
 
-const channel = computed(() => realtime.channel)
-
 const isConnected = computed(() => realtime.isConnected && realtime.isChannelAttached)
 const isLoading = computed(() => !isConnected)
+
+const { channel, participants } = storeToRefs(realtime)
+
+const avatars = computed(() => {
+  const a = []
+  for (let [key, value] of participants.value) {
+    a.push(value)
+  }
+  return a
+})
 
 const options = {
   placeholder: 'Start collaborating! :tada:',
