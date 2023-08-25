@@ -26,8 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
 const bgColours = {
   amber: 'bg-amber-400',
   blue: 'bg-blue-400',
