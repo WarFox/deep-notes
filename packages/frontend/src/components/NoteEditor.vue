@@ -60,8 +60,8 @@ const noteData = ref()
 const content = ref()
 
 // The ref=editor in QuillEditor works like magic!
-const editor = ref(null)
-const quill = ref<Quill>(null)
+const editor = ref<typeof QuillEditor>()
+const quill = ref<Quill>()
 
 const isConnected = computed(() => realtime.isConnected && realtime.isChannelAttached)
 const isLoading = computed(() => !isConnected)
@@ -85,7 +85,7 @@ const options = {
 interface TextChange {
   delta: Delta
   oldContents: Delta
-  source: Sources
+  source: Quill.Sources
 }
 
 function saveNote() {
@@ -94,7 +94,11 @@ function saveNote() {
 
 // TODO set the content of editor with content saved in database
 function handleReady() {
-  quill.value = editor.value.getQuill()
+  if (editor.value) {
+    quill.value = editor.value.getQuill()
+  } else {
+    console.error('handleReady called before editor is ready!')
+  }
 }
 
 function handleTextChange(change: TextChange) {
