@@ -54,7 +54,7 @@ const route = useRoute()
 const realtime = useRealtimeStore()
 const notes = useNoteStore()
 
-const noteId = ref(route.params.id)
+const noteId = ref<string>()
 const noteData = ref()
 
 const content = ref()
@@ -111,10 +111,15 @@ function handleTextChange(change: TextChange) {
 /*
  * selection-change event is triggered when cursor is moved using arrow keys or mouse
  */
-function handleSelectionChange({ range, oldRange, source }) {
+function handleSelectionChange(change: {
+  range: Quill.Range
+  oldRange: Quill.Range
+  source: Quill.Source
+}) {
+  const { range, source } = change
   if (range && source == 'user') {
-    const data = { color: realtime.color, range }
-    channel.value.presence.update(data)
+    const presenseData = { color: realtime.color, range }
+    channel.value.presence.update(presenseData)
   }
 }
 
@@ -141,6 +146,8 @@ watch(noteData, (newData) => {
 
 onMounted(async () => {
   await realtime.initializeAbly()
+
+  noteId.value = route.params.id
 
   noteData.value = await notes.fetchNote(noteId.value)
 

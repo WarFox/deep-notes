@@ -33,7 +33,7 @@ export const useNoteStore = defineStore('notes', () => {
     try {
       const data = await API.post('api', '/notes', { body: { title } })
       if (data) {
-        notes.value.push(data)
+        notes.value?.push(data)
       }
     } catch (error) {
       console.log(error)
