@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useRealtimeStore, Participant } from '../realtime'
+import { useRealtimeStore } from '../realtime'
+import type { Participant } from '../realtime'
 import { Realtime } from 'ably'
 
 vi.mock('ably', () => {
@@ -22,8 +23,8 @@ vi.mock('../../lib/auth', () => {
 })
 
 describe('Realtime Store', () => {
-  let realtime: Realtime = undefined
-  let store = undefined
+  let realtime: Realtime
+  let store: any
 
   afterEach(() => {
     vi.clearAllMocks()
@@ -55,7 +56,7 @@ describe('Realtime Store', () => {
 
   it('addParticipant', () => {
     expect(store.participants).toHaveLength(0)
-    const participant: Participant = { clientId: 'someid', color: 'some color' }
+    const participant: Participant = { clientId: 'someid', color: 'some color', isConnected: true }
     store.addParticipant(participant)
     expect(store.participants).toHaveLength(1)
     expect(store.participants.get('someid')).toEqual(participant)
@@ -63,8 +64,8 @@ describe('Realtime Store', () => {
 
   it('removeParticipant', () => {
     expect(store.participants).toHaveLength(0)
-    const p1: Participant = { clientId: 'someid', color: 'color1' }
-    const p2: Participant = { clientId: 'someid2', color: 'color2' }
+    const p1: Participant = { clientId: 'someid', color: 'color1', isConnected: true }
+    const p2: Participant = { clientId: 'someid2', color: 'color2', isConnected: false }
     store.participants.set(p1.clientId, p1)
     store.participants.set(p2.clientId, p1)
     expect(store.participants).toHaveLength(2)
