@@ -1,5 +1,4 @@
 <template>
-
   <LoadingIndicator v-if="isLoading" />
 
   <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -40,7 +39,7 @@
       <tbody>
         <tr
           v-for="note in notes"
-          :key="notes.noteId"
+          :key="note.noteId"
           class="bg-white border-b dark:bg-neutral-900 dark:border-neutral-700 hover:bg-neutral-600"
         >
           <th
@@ -49,7 +48,7 @@
           >
             {{ note.title }}
           </th>
-          <td class="px-6 py-4">{{ note.createdBy }}</td>
+          <td class="px-6 py-4">{{ note.userId }}</td>
           <td class="px-6 py-4">{{ note.createdAt }}</td>
           <td class="px-6 py-4">
             <router-link

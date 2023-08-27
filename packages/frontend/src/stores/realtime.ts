@@ -39,7 +39,9 @@ export const useRealtimeStore = defineStore('realtime', () => {
 
   function participantLeft(clientId: string) {
     const participant = participants.value.get(clientId)
-    participants.value.set(clientId, { ...participant, ...{ isConnected: false } })
+    if (participant) {
+      participants.value.set(clientId, { ...participant, ...{ isConnected: false } })
+    }
   }
 
   function _connected(realtime: Realtime) {
@@ -77,7 +79,7 @@ export const useRealtimeStore = defineStore('realtime', () => {
   }
 
   function disconnectAbly() {
-    ablyRealtimeClient.value.connection.close()
+    ablyRealtimeClient.value?.connection.close()
     isConnected.value = false
     isChannelAttached.value = false
   }

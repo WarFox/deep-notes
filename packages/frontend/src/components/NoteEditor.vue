@@ -54,14 +54,14 @@ const route = useRoute()
 const realtime = useRealtimeStore()
 const notes = useNoteStore()
 
-const noteId = ref(route.params.id)
+const noteId = ref<string>()
 const noteData = ref()
 
 const content = ref()
 
 // The ref=editor in QuillEditor works like magic!
-const editor = ref(null)
-const quill = ref<Quill>(null)
+const editor = ref<typeof QuillEditor>()
+const quill = ref<Quill>()
 
 const isConnected = computed(() => realtime.isConnected && realtime.isChannelAttached)
 const isLoading = computed(() => !isConnected)
@@ -85,7 +85,7 @@ const options = {
 interface TextChange {
   delta: Delta
   oldContents: Delta
-  source: Sources
+  source: Quill.Sources
 }
 
 function saveNote() {
@@ -94,7 +94,11 @@ function saveNote() {
 
 // TODO set the content of editor with content saved in database
 function handleReady() {
-  quill.value = editor.value.getQuill()
+  if (editor.value) {
+    quill.value = editor.value.getQuill()
+  } else {
+    console.error('handleReady called before editor is ready!')
+  }
 }
 
 function handleTextChange(change: TextChange) {
@@ -107,10 +111,15 @@ function handleTextChange(change: TextChange) {
 /*
  * selection-change event is triggered when cursor is moved using arrow keys or mouse
  */
-function handleSelectionChange({ range, oldRange, source }) {
+function handleSelectionChange(change: {
+  range: Quill.Range
+  oldRange: Quill.Range
+  source: Quill.Source
+}) {
+  const { range, source } = change
   if (range && source == 'user') {
-    const data = { color: realtime.color, range }
-    channel.value.presence.update(data)
+    const presenseData = { color: realtime.color, range }
+    channel.value.presence.update(presenseData)
   }
 }
 
@@ -137,6 +146,15 @@ watch(noteData, (newData) => {
 
 onMounted(async () => {
   await realtime.initializeAbly()
+
+  const noteIds = route.params.id // string | string[]
+
+  if (typeof noteIds === 'string') {
+    noteId.value = noteIds
+  } else {
+    // get the first noteId if there are multiple route params
+    noteId.value = noteIds[0]
+  }
 
   noteData.value = await notes.fetchNote(noteId.value)
 
