@@ -147,7 +147,14 @@ watch(noteData, (newData) => {
 onMounted(async () => {
   await realtime.initializeAbly()
 
-  noteId.value = route.params.id
+  const noteIds = route.params.id // string | string[]
+
+  if (typeof noteIds === 'string') {
+    noteId.value = noteIds
+  } else {
+    // get the first noteId if there are multiple route params
+    noteId.value = noteIds[0]
+  }
 
   noteData.value = await notes.fetchNote(noteId.value)
 
