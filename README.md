@@ -51,8 +51,8 @@ The following technologies are employed
   - [x] List notes
   - [x] Get single note
   - [x] Create note
-  - [ ] Update note
-  - [ ] Delete note
+  - [x] Update note
+  - [x] Delete note
 - Notes UI
   - [x] List notes
   - [x] Get single note
@@ -86,6 +86,11 @@ You need to configure AWS Credentials to depoly this application.
 npm run deploy -- --stage prod
 ```
 Will deploy the application to production stage
+
+## Development
+
+Packages and workspaces are managed by `pnpm`, please make sure you have `pnpm`
+setup in your machine.
 
 ## Commands
 
