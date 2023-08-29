@@ -16,17 +16,12 @@
         >Notes</RouterLink
       >, to view all notes.
     </p>
-    <button
-      @click="auth.signOut"
-      class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-neutral-900 border border-neutral-300 rounded-lg hover:bg-neutral-100 focus:ring-4 focus:ring-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-700 dark:focus:ring-neutral-800"
-    >
-      Sign out
-    </button>
   </authenticator>
 </template>
 
 <script setup lang="ts">
 import HeroSection from '@/components/HeroSection.vue'
+import HelloWorld from './components/HelloWorld.vue'
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-vue'
 import '@aws-amplify/ui-vue/styles.css'
 
