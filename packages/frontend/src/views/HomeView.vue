@@ -6,8 +6,10 @@
     />
   </template>
   <authenticator>
-    <h1>Hello {{ auth.user?.username }}!</h1>
+    <HelloWorld msg="Deep Notes" />
+
     <p>Welcome, You are signed in now!</p>
+
     <p>
       Go to
       <RouterLink
@@ -21,7 +23,7 @@
 
 <script setup lang="ts">
 import HeroSection from '@/components/HeroSection.vue'
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from '@/components/HelloWorld.vue'
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-vue'
 import '@aws-amplify/ui-vue/styles.css'
 
