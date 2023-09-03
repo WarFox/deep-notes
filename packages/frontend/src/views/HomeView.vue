@@ -22,10 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import HeroSection from '@/components/HeroSection.vue'
 import HelloWorld from '@/components/HelloWorld.vue'
-import { Authenticator, useAuthenticator } from '@aws-amplify/ui-vue'
-import '@aws-amplify/ui-vue/styles.css'
+import HeroSection from '@/components/HeroSection.vue'
+import { auth, Authenticator } from '@/lib/auth'
 
-const auth = useAuthenticator()
+import '@aws-amplify/ui-vue/styles.css'
 </script>

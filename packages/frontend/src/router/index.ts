@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import NotesView from '../views/NotesView.vue'
 import EditorView from '../views/EditorView.vue'
-import { useAuthenticator } from '@aws-amplify/ui-vue'
+import { auth } from '@/lib/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,8 +32,6 @@ const router = createRouter({
     }
   ]
 })
-
-const auth = useAuthenticator()
 
 router.beforeEach(async (to, from) => {
   if (
